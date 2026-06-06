@@ -1,9 +1,21 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { hashPassword } from '@/lib/auth'
+import { execSync } from 'child_process'
 
 export async function POST() {
   try {
+    // Auto-push schema to create tables if they don't exist
+    try {
+      execSync('npx prisma db push --accept-data-loss', {
+        stdio: 'pipe',
+        timeout: 30000,
+      })
+    } catch (pushError) {
+      console.error('Schema push warning:', pushError)
+      // Continue anyway - tables might already exist
+    }
+
     // Check if admin already exists
     const existing = await db.user.findUnique({ where: { phone: '770000000' } })
     if (existing) {
@@ -89,4 +101,9 @@ export async function POST() {
     console.error('Seed error:', error)
     return NextResponse.json({ error: 'Erreur lors de l\'initialisation' }, { status: 500 })
   }
+}
+
+// Also handle GET for easy browser access
+export async function GET() {
+  return POST()
 }
