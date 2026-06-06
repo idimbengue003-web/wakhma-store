@@ -9,7 +9,6 @@ import Link from 'next/link'
 import { Suspense } from 'react'
 
 type Tab = 'subscription' | 'points'
-type PaymentMethod = 'orange' | 'wave'
 
 function RechargeContent() {
   const searchParams = useSearchParams()
@@ -28,8 +27,8 @@ function RechargeContent() {
   const [otpCode, setOtpCode] = useState('')
   const [paymentLoading, setPaymentLoading] = useState(false)
 
-  // Wave/SenPay loading state
-  const [waveLoading, setWaveLoading] = useState<string | null>(null) // tier key being loaded
+  // Wave loading state
+  const [waveLoading, setWaveLoading] = useState<string | null>(null)
 
   // ─── Choose payment method modal ───
   const [choosingPayment, setChoosingPayment] = useState<{
@@ -149,32 +148,30 @@ function RechargeContent() {
     setError('')
   }
 
-  // ─── Wave/SenPay flow ───
-  const handleWavePayment = async (type: 'points' | 'subscription', tierIndex: number, tierId: string) => {
-    if (!user) {
-      router.push('/login')
-      return
-    }
+  // ─── Wave payment flow ───
+  const handleWavePayment = async () => {
+    if (!choosingPayment || !user) return
+    const { type, tierIndex, tierId } = choosingPayment
     const key = `${type}-${tierIndex}-${tierId}`
     setWaveLoading(key)
     setError('')
     setChoosingPayment(null)
     try {
-      const res = await fetch('/api/payment/senepay/create', {
+      const res = await fetch('/api/payment/wave/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type, tierIndex, tierId }),
       })
       const data = await res.json()
       if (res.ok && data.redirectUrl) {
-        // Redirect to SenPay payment page
+        // Redirect to Wave payment page (or callback in demo mode)
         window.location.href = data.redirectUrl
       } else {
-        setError(data.error || 'Erreur lors de la création du paiement Wave')
+        setError(data.detail ? `${data.error} : ${data.detail}` : (data.error || 'Erreur lors du paiement Wave'))
         setWaveLoading(null)
       }
     } catch {
-      setError('Erreur de connexion')
+      setError('Erreur de connexion au serveur')
       setWaveLoading(null)
     }
   }
@@ -214,8 +211,8 @@ function RechargeContent() {
 
       {error && (
         <div className="mb-5 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center justify-between">
-          <span>{error === 'paiement_annule' ? 'Paiement annulé' : error === 'callback_invalide' ? 'Callback invalide' : error}</span>
-          <button onClick={() => setError('')} className="text-red-400 hover:text-red-600">
+          <span className="break-words">{error === 'paiement_annule' ? 'Paiement annulé' : error === 'callback_invalide' ? 'Callback invalide' : error === 'erreur_serveur' ? 'Erreur serveur, réessaie' : error}</span>
+          <button onClick={() => setError('')} className="text-red-400 hover:text-red-600 shrink-0 ml-2">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -231,10 +228,30 @@ function RechargeContent() {
             </p>
 
             <div className="space-y-3">
+              {/* Wave */}
+              <button
+                onClick={handleWavePayment}
+                disabled={waveLoading !== null}
+                className="w-full flex items-center gap-3 p-4 border-2 border-[#1DC7EA]/30 hover:border-[#1DC7EA] rounded-xl transition-colors text-left disabled:opacity-50 bg-[#1DC7EA]/5"
+              >
+                <div className="w-12 h-12 bg-[#1DC7EA] rounded-xl flex items-center justify-center shrink-0">
+                  <svg viewBox="0 0 24 24" className="w-7 h-7 text-white" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <div className="font-bold text-gray-900 text-sm">Payer avec Wave</div>
+                  <div className="text-[11px] text-gray-500">Paiement rapide et sécurisé</div>
+                </div>
+                {waveLoading === `${choosingPayment.type}-${choosingPayment.tierIndex}-${choosingPayment.tierId}` && (
+                  <div className="animate-spin w-5 h-5 border-2 border-[#1DC7EA] border-t-transparent rounded-full" />
+                )}
+              </button>
+
               {/* Orange Money */}
               <button
                 onClick={startOrangeMoney}
-                className="w-full flex items-center gap-3 p-4 border-2 border-orange/30 hover:border-orange rounded-xl transition-colors text-left"
+                className="w-full flex items-center gap-3 p-4 border-2 border-orange/30 hover:border-orange rounded-xl transition-colors text-left bg-orange/5"
               >
                 <div className="w-12 h-12 bg-orange rounded-xl flex items-center justify-center shrink-0">
                   <Phone className="w-6 h-6 text-white" />
@@ -244,30 +261,10 @@ function RechargeContent() {
                   <div className="text-[11px] text-gray-500">Paiement par code OTP</div>
                 </div>
               </button>
-
-              {/* Wave / SenPay */}
-              <button
-                onClick={() => handleWavePayment(choosingPayment.type, choosingPayment.tierIndex, choosingPayment.tierId)}
-                disabled={waveLoading !== null}
-                className="w-full flex items-center gap-3 p-4 border-2 border-blue-500/30 hover:border-blue-500 rounded-xl transition-colors text-left disabled:opacity-50"
-              >
-                <div className="w-12 h-12 bg-[#1DC7EA] rounded-xl flex items-center justify-center shrink-0">
-                  <svg viewBox="0 0 24 24" className="w-7 h-7 text-white" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <div className="font-bold text-gray-900 text-sm">Wave</div>
-                  <div className="text-[11px] text-gray-500">Redirection vers SenPay</div>
-                </div>
-                {waveLoading === `${choosingPayment.type}-${choosingPayment.tierIndex}-${choosingPayment.tierId}` && (
-                  <div className="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full" />
-                )}
-              </button>
             </div>
 
             <button
-              onClick={() => setChoosingPayment(null)}
+              onClick={() => { setChoosingPayment(null); setWaveLoading(null) }}
               className="w-full mt-4 py-2.5 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
               Annuler
@@ -419,23 +416,20 @@ function RechargeContent() {
                   ))}
                 </ul>
 
-                {/* Payment buttons */}
-                <div className="space-y-2">
-                  <button
-                    onClick={() => handleChoosePayment('subscription', -1, tier.id)}
-                    className={`w-full py-2.5 rounded-lg font-bold text-sm ${
-                      tier.id === 'king'
-                        ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
-                        : 'bg-orange hover:bg-orange-dark text-white'
-                    }`}
-                  >
-                    {tier.id === 'king' ? (
-                      <span className="flex items-center justify-center gap-1.5"><Crown className="w-4 h-4" /> Devenir VIP KING</span>
-                    ) : (
-                      <span className="flex items-center justify-center gap-1.5"><Star className="w-4 h-4" /> Devenir Diambar</span>
-                    )}
-                  </button>
-                </div>
+                <button
+                  onClick={() => handleChoosePayment('subscription', -1, tier.id)}
+                  className={`w-full py-2.5 rounded-lg font-bold text-sm ${
+                    tier.id === 'king'
+                      ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                      : 'bg-orange hover:bg-orange-dark text-white'
+                  }`}
+                >
+                  {tier.id === 'king' ? (
+                    <span className="flex items-center justify-center gap-1.5"><Crown className="w-4 h-4" /> Devenir VIP KING</span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-1.5"><Star className="w-4 h-4" /> Devenir Diambar</span>
+                  )}
+                </button>
               </div>
             </div>
           ))}
@@ -454,16 +448,13 @@ function RechargeContent() {
               </div>
               <div className="text-sm text-orange font-semibold mb-3">{formatFCFA(tier.prix)}</div>
 
-              {/* Payment buttons */}
-              <div className="space-y-1.5">
-                <button
-                  onClick={() => handleChoosePayment('points', index, '')}
-                  disabled={waveLoading === `points-${index}-`}
-                  className="w-full py-2 bg-orange hover:bg-orange-dark text-white rounded-lg font-bold text-xs disabled:opacity-50"
-                >
-                  Acheter
-                </button>
-              </div>
+              <button
+                onClick={() => handleChoosePayment('points', index, '')}
+                disabled={waveLoading === `points-${index}-`}
+                className="w-full py-2 bg-orange hover:bg-orange-dark text-white rounded-lg font-bold text-xs disabled:opacity-50"
+              >
+                Acheter
+              </button>
             </div>
           ))}
         </div>
