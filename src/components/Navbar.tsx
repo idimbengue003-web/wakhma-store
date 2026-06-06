@@ -48,7 +48,9 @@ export function Navbar() {
                   {user.subscriptionTier === 'king' && <span className="text-xs">⭐</span>}
                   {user.subscriptionTier === 'diambar' && <span className="text-xs">💎</span>}
                 </button>
-                <div className="absolute right-0 mt-1 w-52 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible">
+                {/* Invisible bridge to keep dropdown open when moving mouse */}
+                <div className="absolute right-0 top-full h-2 w-full" />
+                <div className="absolute right-0 top-[calc(100%+0.5rem)] w-52 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-150">
                   <div className="px-3 py-2 border-b border-gray-100">
                     <p className="text-xs font-medium text-gray-900 truncate">{user.name}</p>
                     <p className="text-[10px] text-gray-500 capitalize">{user.userType === 'vendeur' ? 'Vendeur' : 'Acheteur'}</p>
