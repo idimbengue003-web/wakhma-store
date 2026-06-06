@@ -2,8 +2,30 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { hashPassword, signToken } from '@/lib/auth'
 
+// Auto-migrate: ensure all required columns exist in the User table
+async function ensureUserColumns() {
+  const columns = [
+    { name: 'userType', sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "userType" TEXT NOT NULL DEFAULT 'acheteur'` },
+    { name: 'salesCount', sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "salesCount" INTEGER NOT NULL DEFAULT 0` },
+    { name: 'purchasesCount', sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "purchasesCount" INTEGER NOT NULL DEFAULT 0` },
+    { name: 'subscriptionTier', sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "subscriptionTier" TEXT` },
+    { name: 'subscriptionStart', sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "subscriptionStart" TEXT` },
+    { name: 'subscriptionEnd', sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "subscriptionEnd" TEXT` },
+  ]
+  for (const col of columns) {
+    try {
+      await db.$executeRawUnsafe(col.sql)
+    } catch {
+      // Column already exists, ignore
+    }
+  }
+}
+
 export async function POST(request: Request) {
   try {
+    // Auto-migrate first to ensure DB schema is in sync
+    await ensureUserColumns()
+
     const body = await request.json()
     const { name, phone, password, userType } = body
 
@@ -17,9 +39,9 @@ export async function POST(request: Request) {
     // Validate userType
     const validType = userType === 'vendeur' ? 'vendeur' : 'acheteur'
 
-    // Validate Senegal phone
-    const phoneClean = phone.replace(/\s/g, '')
-    if (!/^7[0-8]\d{7}$/.test(phoneClean)) {
+    // Validate Senegal phone - accept 70-79 (all Senegalese operators)
+    const phoneClean = phone.replace(/[\s+]/g, '').replace(/^221/, '')
+    if (!/^7[0-9]\d{7}$/.test(phoneClean)) {
       return NextResponse.json(
         { error: 'Numéro de téléphone invalide (format: 7X XXX XX XX)' },
         { status: 400 }
@@ -91,7 +113,6 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Register error:', error)
     const msg = error instanceof Error ? error.message : String(error)
-    // Return more specific error for debugging (remove in production if needed)
     return NextResponse.json(
       { error: 'Erreur lors de l\'inscription', detail: msg },
       { status: 500 }

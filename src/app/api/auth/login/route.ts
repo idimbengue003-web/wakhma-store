@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const phoneClean = phone.replace(/\s/g, '')
+    const phoneClean = phone.replace(/[\s+]/g, '').replace(/^221/, '')
 
     const user = await db.user.findUnique({ where: { phone: phoneClean } })
     if (!user || !user.password) {
@@ -66,8 +66,9 @@ export async function POST(request: Request) {
     return response
   } catch (error) {
     console.error('Login error:', error)
+    const msg = error instanceof Error ? error.message : String(error)
     return NextResponse.json(
-      { error: 'Erreur lors de la connexion' },
+      { error: 'Erreur lors de la connexion', detail: msg },
       { status: 500 }
     )
   }

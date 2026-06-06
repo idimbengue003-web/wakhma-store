@@ -31,7 +31,7 @@ export function LoginForm() {
         await fetchUser()
         router.push('/')
       } else {
-        setError(data.error || 'Erreur de connexion')
+        setError(data.detail ? `${data.error} : ${data.detail}` : (data.error || 'Erreur de connexion'))
       }
     } catch {
       setError('Erreur de connexion')
@@ -43,7 +43,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 break-words">
           {error}
         </div>
       )}
@@ -111,10 +111,10 @@ export function RegisterForm() {
         await fetchUser()
         router.push('/')
       } else {
-        setError(data.error || 'Erreur d&apos;inscription')
+        setError(data.detail ? `${data.error} : ${data.detail}` : (data.error || 'Erreur d\'inscription'))
       }
     } catch {
-      setError('Erreur de connexion')
+      setError('Erreur de connexion au serveur')
     } finally {
       setLoading(false)
     }
@@ -123,7 +123,7 @@ export function RegisterForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 break-words">
           {error}
         </div>
       )}
