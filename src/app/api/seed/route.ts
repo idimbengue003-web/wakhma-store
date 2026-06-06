@@ -6,7 +6,7 @@ async function ensureTables() {
   // Create tables with raw SQL if they don't exist
   await db.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS "User" (
-      "id" TEXT NOT NULL PRIMARY KEY DEFAULT (lowercase(cuid())),
+      "id" TEXT NOT NULL PRIMARY KEY,
       "name" TEXT NOT NULL,
       "phone" TEXT NOT NULL UNIQUE,
       "password" TEXT,
@@ -21,7 +21,7 @@ async function ensureTables() {
 
   await db.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS "Demand" (
-      "id" TEXT NOT NULL PRIMARY KEY DEFAULT (lowercase(cuid())),
+      "id" TEXT NOT NULL PRIMARY KEY,
       "title" TEXT NOT NULL,
       "description" TEXT NOT NULL,
       "category" TEXT NOT NULL DEFAULT 'Autre',
@@ -38,7 +38,7 @@ async function ensureTables() {
 
   await db.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS "Reveal" (
-      "id" TEXT NOT NULL PRIMARY KEY DEFAULT (lowercase(cuid())),
+      "id" TEXT NOT NULL PRIMARY KEY,
       "userId" TEXT NOT NULL,
       "demandId" TEXT NOT NULL,
       "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
