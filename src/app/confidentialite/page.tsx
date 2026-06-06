@@ -2,8 +2,8 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Politique de confidentialité - WakhmaStore',
-  description: 'Politique de confidentialité et protection des données de WakhmaStore',
+  title: 'Politique de confidentialité - Wakhma Store',
+  description: 'Politique de confidentialité et protection des données de Wakhma Store',
 }
 
 export default function Confidentialite() {
@@ -18,7 +18,7 @@ export default function Confidentialite() {
       <div className="prose prose-gray max-w-none space-y-6 text-sm text-gray-700">
         <section>
           <h2 className="text-lg font-bold text-gray-900">1. Données collectées</h2>
-          <p>WakhmaStore collecte les données suivantes lors de votre inscription et utilisation du site : nom, numéro de téléphone, mot de passe (chiffré). Lors de la publication d&apos;annonces, les données saisies (titre, description, photos, numéro WhatsApp, localisation) sont enregistrées. Les données de paiement sont traitées de manière sécurisée et ne sont pas partagées avec des tiers.</p>
+          <p>Wakhma Store collecte les données suivantes lors de votre inscription et utilisation du site : nom, numéro de téléphone, mot de passe (chiffré). Lors de la publication d&apos;annonces, les données saisies (titre, description, photos, numéro WhatsApp, localisation) sont enregistrées. Les données de paiement sont traitées de manière sécurisée et ne sont pas partagées avec des tiers.</p>
         </section>
 
         <section>

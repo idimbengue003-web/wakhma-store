@@ -58,7 +58,7 @@ export async function autoMigrate() {
           "orderReference" TEXT UNIQUE,
           "tierIndex" INTEGER,
           "tierId" TEXT,
-          "provider" TEXT NOT NULL DEFAULT 'senepay',
+          "provider" TEXT NOT NULL DEFAULT 'whatsapp',
           "providerTxId" TEXT,
           "netAmount" INTEGER,
           "fees" INTEGER,

@@ -2,8 +2,8 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'CGU - WakhmaStore',
-  description: 'Conditions générales d\'utilisation de WakhmaStore',
+  title: 'CGU - Wakhma Store',
+  description: 'Conditions générales d\'utilisation de Wakhma Store',
 }
 
 export default function CGU() {
@@ -18,7 +18,7 @@ export default function CGU() {
       <div className="prose prose-gray max-w-none space-y-6 text-sm text-gray-700">
         <section>
           <h2 className="text-lg font-bold text-gray-900">1. Objet</h2>
-          <p>Les présentes CGU régissent l&apos;utilisation du site WakhmaStore, plateforme de petites annonces dédiée aux achats et ventes entre particuliers au Sénégal. En utilisant le site, vous acceptez ces conditions sans réserve.</p>
+          <p>Les présentes CGU régissent l&apos;utilisation du site Wakhma Store, plateforme de petites annonces dédiée aux achats et ventes entre particuliers au Sénégal. En utilisant le site, vous acceptez ces conditions sans réserve.</p>
         </section>
 
         <section>
@@ -28,12 +28,12 @@ export default function CGU() {
 
         <section>
           <h2 className="text-lg font-bold text-gray-900">3. Annonces</h2>
-          <p>Les utilisateurs peuvent publier des annonces pour rechercher ou vendre des biens et services. Toute annonce doit être conforme à la loi sénégalaise. Sont interdits : les contenus illicites, trompeurs, discriminatoires, ou portant atteinte aux droits d&apos;un tiers. WakhmaStore se réserve le droit de supprimer toute annonce non conforme sans préavis.</p>
+          <p>Les utilisateurs peuvent publier des annonces pour rechercher ou vendre des biens et services. Toute annonce doit être conforme à la loi sénégalaise. Sont interdits : les contenus illicites, trompeurs, discriminatoires, ou portant atteinte aux droits d&apos;un tiers. Wakhma Store se réserve le droit de supprimer toute annonce non conforme sans préavis.</p>
         </section>
 
         <section>
           <h2 className="text-lg font-bold text-gray-900">4. Système de points et abonnements</h2>
-          <p>WakhmaStore propose un système de points permettant de révéler les numéros WhatsApp des vendeurs. Les points sont achetés via Wave et validés par notre équipe via WhatsApp. Les abonnements Diambar et VIP KING donnent accès à des avantages pendant une durée de 30 jours. À l&apos;expiration, l&apos;abonnement est résilié automatiquement sans renouvellement.</p>
+          <p>Wakhma Store propose un système de points permettant de révéler les numéros WhatsApp des vendeurs. Les points sont achetés via Wave et validés par notre équipe via WhatsApp. Les abonnements Diambar et VIP KING donnent accès à des avantages pendant une durée de 30 jours. À l&apos;expiration, l&apos;abonnement est résilié automatiquement sans renouvellement.</p>
         </section>
 
         <section>
@@ -48,12 +48,12 @@ export default function CGU() {
 
         <section>
           <h2 className="text-lg font-bold text-gray-900">7. Suspension et résiliation</h2>
-          <p>WakhmaStore se réserve le droit de suspendre ou supprimer tout compte ne respectant pas les CGU, sans préavis ni indemnité. L&apos;utilisateur peut supprimer son compte à tout moment en nous contactant.</p>
+          <p>Wakhma Store se réserve le droit de suspendre ou supprimer tout compte ne respectant pas les CGU, sans préavis ni indemnité. L&apos;utilisateur peut supprimer son compte à tout moment en nous contactant.</p>
         </section>
 
         <section>
           <h2 className="text-lg font-bold text-gray-900">8. Modification des CGU</h2>
-          <p>WakhmaStore se réserve le droit de modifier les présentes CGU à tout moment. Les modifications prennent effet dès leur publication sur le site. L&apos;utilisation continue du site vaut acceptation des nouvelles conditions.</p>
+          <p>Wakhma Store se réserve le droit de modifier les présentes CGU à tout moment. Les modifications prennent effet dès leur publication sur le site. L&apos;utilisation continue du site vaut acceptation des nouvelles conditions.</p>
         </section>
       </div>
     </div>

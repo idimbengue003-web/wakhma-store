@@ -2,8 +2,8 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Mentions légales - WakhmaStore',
-  description: 'Mentions légales du site WakhmaStore',
+  title: 'Mentions légales - Wakhma Store',
+  description: 'Mentions légales du site Wakhma Store',
 }
 
 export default function MentionsLegales() {
@@ -18,7 +18,7 @@ export default function MentionsLegales() {
       <div className="prose prose-gray max-w-none space-y-6 text-sm text-gray-700">
         <section>
           <h2 className="text-lg font-bold text-gray-900">1. Éditeur du site</h2>
-          <p>WakhmaStore est un site de petites annonces dédié aux achats et ventes entre particuliers au Sénégal.</p>
+          <p>Wakhma Store est un site de petites annonces dédié aux achats et ventes entre particuliers au Sénégal.</p>
           <p>Email : contact@wakhmastore.com</p>
         </section>
 
@@ -34,12 +34,12 @@ export default function MentionsLegales() {
 
         <section>
           <h2 className="text-lg font-bold text-gray-900">4. Responsabilité</h2>
-          <p>WakhmaStore est une plateforme de mise en relation entre acheteurs et vendeurs. WakhmaStore ne saurait être tenu responsable des transactions effectuées entre les utilisateurs, ni de l&apos;exactitude des annonces publiées. Chaque utilisateur reste seul responsable du contenu de ses annonces et de ses actes sur la plateforme.</p>
+          <p>Wakhma Store est une plateforme de mise en relation entre acheteurs et vendeurs. Wakhma Store ne saurait être tenu responsable des transactions effectuées entre les utilisateurs, ni de l&apos;exactitude des annonces publiées. Chaque utilisateur reste seul responsable du contenu de ses annonces et de ses actes sur la plateforme.</p>
         </section>
 
         <section>
           <h2 className="text-lg font-bold text-gray-900">5. Paiements</h2>
-          <p>Les paiements sur WakhmaStore sont effectués via Wave et validés par notre équipe. Les transactions sont sécurisées et vérifiées manuellement pour garantir la sécurité de chaque utilisateur. WakhmaStore ne conserve aucune donnée bancaire.</p>
+          <p>Les paiements sur Wakhma Store sont effectués via Wave et validés par notre équipe. Les transactions sont sécurisées et vérifiées manuellement pour garantir la sécurité de chaque utilisateur. Wakhma Store ne conserve aucune donnée bancaire.</p>
         </section>
 
         <section>

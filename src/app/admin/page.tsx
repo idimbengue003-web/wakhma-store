@@ -196,7 +196,7 @@ export default function AdminDashboard() {
             <Shield className="w-7 h-7 text-red-500" />
             Administration
           </h1>
-          <p className="text-gray-500 mt-1">Gérer la plateforme Wakh Ma Store</p>
+          <p className="text-gray-500 mt-1">Gérer la plateforme Wakhma Store</p>
         </div>
         <button
           onClick={refreshData}
@@ -500,7 +500,7 @@ export default function AdminDashboard() {
                               }`}>
                                 {payment.provider === 'whatsapp' ? (
                                   <span className="flex items-center gap-1"><MessageCircle className="w-3 h-3" /> WhatsApp</span>
-                                ) : 'SenePay'}
+                                ) : 'Wave'}
                               </span>
 
                               {/* Status badge */}
