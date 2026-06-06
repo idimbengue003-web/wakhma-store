@@ -197,6 +197,6 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('[SenePay] Payment create error:', error)
     const msg = error instanceof Error ? error.message : String(error)
-    return NextResponse.json({ error: 'Erreur serveur', detail: msg }, { status: 500 })
+    return NextResponse.json({ error: `Erreur serveur: ${msg}` }, { status: 500 })
   }
 }
