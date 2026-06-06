@@ -1,23 +1,26 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuthStore } from '@/lib/store'
 import { SUBSCRIPTION_TIERS, POINTS_TIERS, formatFCFA } from '@/lib/constants'
-import { CheckCircle, ArrowLeft, Zap, Crown, Star, Phone } from 'lucide-react'
+import { CheckCircle, ArrowLeft, Zap, Crown, Star, Phone, X } from 'lucide-react'
 import Link from 'next/link'
+import { Suspense } from 'react'
 
 type Tab = 'subscription' | 'points'
+type PaymentMethod = 'orange' | 'wave'
 
-export default function RechargePage() {
+function RechargeContent() {
+  const searchParams = useSearchParams()
   const { user, fetchUser } = useAuthStore()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('subscription')
   const [success, setSuccess] = useState<string | null>(null)
-  const [error, setError] = useState('')
+  const [error, setError] = useState(searchParams.get('error') || '')
 
   // Orange Money payment state
-  const [paymentStep, setPaymentStep] = useState<'idle' | 'phone' | 'otp' | 'processing'>('idle')
+  const [omStep, setOmStep] = useState<'idle' | 'phone' | 'otp'>('idle')
   const [paymentType, setPaymentType] = useState<'points' | 'subscription' | null>(null)
   const [paymentTierIndex, setPaymentTierIndex] = useState<number>(-1)
   const [paymentTierId, setPaymentTierId] = useState<string>('')
@@ -25,19 +28,49 @@ export default function RechargePage() {
   const [otpCode, setOtpCode] = useState('')
   const [paymentLoading, setPaymentLoading] = useState(false)
 
-  const startPayment = (type: 'points' | 'subscription', tierIndex: number, tierId: string) => {
+  // Wave/SenPay loading state
+  const [waveLoading, setWaveLoading] = useState<string | null>(null) // tier key being loaded
+
+  // ─── Choose payment method modal ───
+  const [choosingPayment, setChoosingPayment] = useState<{
+    type: 'points' | 'subscription'
+    tierIndex: number
+    tierId: string
+    label: string
+    amount: number
+  } | null>(null)
+
+  const getPaymentInfo = (type: 'points' | 'subscription', tierIndex: number, tierId: string) => {
+    if (type === 'points') {
+      const tier = POINTS_TIERS[tierIndex]
+      return { label: `${tier.points.toLocaleString('fr-FR')} pts`, amount: tier.prix }
+    } else {
+      const tier = SUBSCRIPTION_TIERS.find(t => t.id === tierId)
+      return { label: tier?.name || '', amount: tier?.price || 0 }
+    }
+  }
+
+  const handleChoosePayment = (type: 'points' | 'subscription', tierIndex: number, tierId: string) => {
     if (!user) {
       router.push('/login')
       return
     }
-    setPaymentType(type)
-    setPaymentTierIndex(tierIndex)
-    setPaymentTierId(tierId)
-    setPaymentStep('phone')
-    setPhoneNumber('')
-    setOtpCode('')
+    const info = getPaymentInfo(type, tierIndex, tierId)
+    setChoosingPayment({ type, tierIndex, tierId, label: info.label, amount: info.amount })
     setError('')
     setSuccess(null)
+  }
+
+  // ─── Orange Money flow ───
+  const startOrangeMoney = () => {
+    if (!choosingPayment) return
+    setPaymentType(choosingPayment.type)
+    setPaymentTierIndex(choosingPayment.tierIndex)
+    setPaymentTierId(choosingPayment.tierId)
+    setOmStep('phone')
+    setPhoneNumber('')
+    setOtpCode('')
+    setChoosingPayment(null)
   }
 
   const handleSendOTP = async () => {
@@ -60,7 +93,7 @@ export default function RechargePage() {
       })
       const data = await res.json()
       if (res.ok) {
-        setPaymentStep('otp')
+        setOmStep('otp')
       } else {
         setError(data.error || 'Erreur lors de l\'envoi de l\'OTP')
       }
@@ -97,7 +130,7 @@ export default function RechargePage() {
         } else {
           setSuccess(`Abonnement activé ! ${data.bonusPoints?.toLocaleString('fr-FR') || ''} points offerts`)
         }
-        setPaymentStep('idle')
+        setOmStep('idle')
         await fetchUser()
       } else {
         setError(data.error || 'Paiement échoué')
@@ -109,11 +142,41 @@ export default function RechargePage() {
     }
   }
 
-  const cancelPayment = () => {
-    setPaymentStep('idle')
+  const cancelOMPayment = () => {
+    setOmStep('idle')
     setPhoneNumber('')
     setOtpCode('')
     setError('')
+  }
+
+  // ─── Wave/SenPay flow ───
+  const handleWavePayment = async (type: 'points' | 'subscription', tierIndex: number, tierId: string) => {
+    if (!user) {
+      router.push('/login')
+      return
+    }
+    const key = `${type}-${tierIndex}-${tierId}`
+    setWaveLoading(key)
+    setError('')
+    setChoosingPayment(null)
+    try {
+      const res = await fetch('/api/payment/senepay/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type, tierIndex, tierId }),
+      })
+      const data = await res.json()
+      if (res.ok && data.redirectUrl) {
+        // Redirect to SenPay payment page
+        window.location.href = data.redirectUrl
+      } else {
+        setError(data.error || 'Erreur lors de la création du paiement Wave')
+        setWaveLoading(null)
+      }
+    } catch {
+      setError('Erreur de connexion')
+      setWaveLoading(null)
+    }
   }
 
   return (
@@ -150,13 +213,71 @@ export default function RechargePage() {
       )}
 
       {error && (
-        <div className="mb-5 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
-          {error}
+        <div className="mb-5 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center justify-between">
+          <span>{error === 'paiement_annule' ? 'Paiement annulé' : error === 'callback_invalide' ? 'Callback invalide' : error}</span>
+          <button onClick={() => setError('')} className="text-red-400 hover:text-red-600">
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
 
-      {/* ─── ORANGE MONEY PAYMENT MODAL ─── */}
-      {paymentStep !== 'idle' && (
+      {/* ─── CHOOSE PAYMENT METHOD MODAL ─── */}
+      {choosingPayment && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-fade-in">
+            <h3 className="font-bold text-gray-900 text-lg mb-1">Choisis le paiement</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              {choosingPayment.label} — <span className="font-bold text-orange">{formatFCFA(choosingPayment.amount)}</span>
+            </p>
+
+            <div className="space-y-3">
+              {/* Orange Money */}
+              <button
+                onClick={startOrangeMoney}
+                className="w-full flex items-center gap-3 p-4 border-2 border-orange/30 hover:border-orange rounded-xl transition-colors text-left"
+              >
+                <div className="w-12 h-12 bg-orange rounded-xl flex items-center justify-center shrink-0">
+                  <Phone className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <div className="font-bold text-gray-900 text-sm">Orange Money</div>
+                  <div className="text-[11px] text-gray-500">Paiement par code OTP</div>
+                </div>
+              </button>
+
+              {/* Wave / SenPay */}
+              <button
+                onClick={() => handleWavePayment(choosingPayment.type, choosingPayment.tierIndex, choosingPayment.tierId)}
+                disabled={waveLoading !== null}
+                className="w-full flex items-center gap-3 p-4 border-2 border-blue-500/30 hover:border-blue-500 rounded-xl transition-colors text-left disabled:opacity-50"
+              >
+                <div className="w-12 h-12 bg-[#1DC7EA] rounded-xl flex items-center justify-center shrink-0">
+                  <svg viewBox="0 0 24 24" className="w-7 h-7 text-white" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <div className="font-bold text-gray-900 text-sm">Wave</div>
+                  <div className="text-[11px] text-gray-500">Redirection vers SenPay</div>
+                </div>
+                {waveLoading === `${choosingPayment.type}-${choosingPayment.tierIndex}-${choosingPayment.tierId}` && (
+                  <div className="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full" />
+                )}
+              </button>
+            </div>
+
+            <button
+              onClick={() => setChoosingPayment(null)}
+              className="w-full mt-4 py-2.5 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ─── ORANGE MONEY OTP MODAL ─── */}
+      {omStep !== 'idle' && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-fade-in">
             <div className="flex items-center gap-3 mb-4">
@@ -174,7 +295,7 @@ export default function RechargePage() {
               </div>
             </div>
 
-            {paymentStep === 'phone' && (
+            {omStep === 'phone' && (
               <>
                 <p className="text-sm text-gray-600 mb-3">
                   Entre ton numéro Orange Money pour recevoir le code OTP :
@@ -189,7 +310,7 @@ export default function RechargePage() {
                 />
                 <div className="flex gap-2 mt-4">
                   <button
-                    onClick={cancelPayment}
+                    onClick={cancelOMPayment}
                     className="flex-1 py-2.5 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50"
                   >
                     Annuler
@@ -205,7 +326,7 @@ export default function RechargePage() {
               </>
             )}
 
-            {paymentStep === 'otp' && (
+            {omStep === 'otp' && (
               <>
                 <p className="text-sm text-gray-600 mb-3">
                   Un code OTP a été envoyé au <span className="font-bold">{phoneNumber}</span>. Entre-le ci-dessous :
@@ -221,7 +342,7 @@ export default function RechargePage() {
                 />
                 <div className="flex gap-2 mt-4">
                   <button
-                    onClick={cancelPayment}
+                    onClick={cancelOMPayment}
                     className="flex-1 py-2.5 border border-gray-300 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50"
                   >
                     Annuler
@@ -242,13 +363,6 @@ export default function RechargePage() {
                   Renvoyer le code OTP
                 </button>
               </>
-            )}
-
-            {paymentStep === 'processing' && (
-              <div className="text-center py-4">
-                <div className="animate-spin w-8 h-8 border-2 border-orange border-t-transparent rounded-full mx-auto mb-3" />
-                <p className="text-sm text-gray-600">Traitement en cours...</p>
-              </div>
             )}
           </div>
         </div>
@@ -304,20 +418,24 @@ export default function RechargePage() {
                     </li>
                   ))}
                 </ul>
-                <button
-                  onClick={() => startPayment('subscription', -1, tier.id)}
-                  className={`w-full py-2.5 rounded-lg font-bold text-sm ${
-                    tier.id === 'king'
-                      ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
-                      : 'bg-orange hover:bg-orange-dark text-white'
-                  }`}
-                >
-                  {tier.id === 'king' ? (
-                    <span className="flex items-center justify-center gap-1.5"><Crown className="w-4 h-4" /> Devenir VIP KING</span>
-                  ) : (
-                    <span className="flex items-center justify-center gap-1.5"><Star className="w-4 h-4" /> Devenir Diambar</span>
-                  )}
-                </button>
+
+                {/* Payment buttons */}
+                <div className="space-y-2">
+                  <button
+                    onClick={() => handleChoosePayment('subscription', -1, tier.id)}
+                    className={`w-full py-2.5 rounded-lg font-bold text-sm ${
+                      tier.id === 'king'
+                        ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                        : 'bg-orange hover:bg-orange-dark text-white'
+                    }`}
+                  >
+                    {tier.id === 'king' ? (
+                      <span className="flex items-center justify-center gap-1.5"><Crown className="w-4 h-4" /> Devenir VIP KING</span>
+                    ) : (
+                      <span className="flex items-center justify-center gap-1.5"><Star className="w-4 h-4" /> Devenir Diambar</span>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -335,12 +453,17 @@ export default function RechargePage() {
                 <span className="text-xs text-gray-500"> pts</span>
               </div>
               <div className="text-sm text-orange font-semibold mb-3">{formatFCFA(tier.prix)}</div>
-              <button
-                onClick={() => startPayment('points', index, '')}
-                className="w-full py-2 bg-orange hover:bg-orange-dark text-white rounded-lg font-bold text-xs"
-              >
-                Acheter
-              </button>
+
+              {/* Payment buttons */}
+              <div className="space-y-1.5">
+                <button
+                  onClick={() => handleChoosePayment('points', index, '')}
+                  disabled={waveLoading === `points-${index}-`}
+                  className="w-full py-2 bg-orange hover:bg-orange-dark text-white rounded-lg font-bold text-xs disabled:opacity-50"
+                >
+                  Acheter
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -353,5 +476,17 @@ export default function RechargePage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function RechargePage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-4xl mx-auto px-4 py-12 text-center">
+        <div className="animate-spin w-8 h-8 border-2 border-orange border-t-transparent rounded-full mx-auto" />
+      </div>
+    }>
+      <RechargeContent />
+    </Suspense>
   )
 }
