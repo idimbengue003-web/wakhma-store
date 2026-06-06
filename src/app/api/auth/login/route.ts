@@ -47,7 +47,11 @@ export async function POST(request: Request) {
         role: user.role,
         name: user.name,
         subscriptionTier: user.subscriptionTier,
+        subscriptionEnd: user.subscriptionEnd,
         points: user.points,
+        userType: user.userType,
+        salesCount: user.salesCount,
+        purchasesCount: user.purchasesCount,
       },
     })
 

@@ -18,7 +18,11 @@ export async function GET() {
         role: true,
         points: true,
         subscriptionTier: true,
+        subscriptionStart: true,
         subscriptionEnd: true,
+        userType: true,
+        salesCount: true,
+        purchasesCount: true,
       },
     })
 
@@ -33,7 +37,11 @@ export async function GET() {
         role: user.role,
         name: user.name,
         subscriptionTier: user.subscriptionTier,
+        subscriptionEnd: user.subscriptionEnd,
         points: user.points,
+        userType: user.userType,
+        salesCount: user.salesCount,
+        purchasesCount: user.purchasesCount,
       },
     })
   } catch (error) {

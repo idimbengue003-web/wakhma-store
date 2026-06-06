@@ -13,9 +13,30 @@ export async function GET(request: Request) {
     const search = searchParams.get('search')
     const limitParam = searchParams.get('limit')
     const annonceType = searchParams.get('annonceType')
+    const userId = searchParams.get('userId')
+    const includeExpired = searchParams.get('includeExpired') === 'true'
     const limit = limitParam ? parseInt(limitParam) : undefined
 
-    const where: Record<string, unknown> = { status: 'active' }
+    // Auto-expire annonces that are past their expiresAt
+    await db.demand.updateMany({
+      where: {
+        status: 'active',
+        expiresAt: { lt: new Date() },
+      },
+      data: { status: 'expired' },
+    })
+
+    const where: Record<string, unknown> = {}
+
+    // By default, only show active (non-expired, non-sold) annonces
+    if (includeExpired) {
+      where.status = { in: ['active', 'expired'] }
+    } else if (userId) {
+      // User's own annonces: show all statuses
+      where.userId = userId
+    } else {
+      where.status = 'active'
+    }
 
     if (category && category !== 'Toutes') {
       where.category = category
@@ -59,10 +80,13 @@ export async function GET(request: Request) {
         whatsappRevealed: isOwner || hasRevealed,
         status: d.status,
         annonceType: d.annonceType || 'cherche',
+        expiresAt: d.expiresAt?.toISOString() || null,
         createdAt: d.createdAt,
         userName: d.user.name,
         userSubscriptionTier: d.user.subscriptionTier,
         userType: d.user.userType || 'acheteur',
+        userSalesCount: d.user.salesCount || 0,
+        userPurchasesCount: d.user.purchasesCount || 0,
         hasPhoneInText: containsPhoneInText(d.description),
       }
     })
@@ -167,6 +191,10 @@ export async function POST(request: Request) {
     const prefix = isVente ? 'Je vends' : 'Je cherche'
     const fullTitle = title.startsWith(prefix) ? title : `${prefix} ${title}`
 
+    // Set expiration: 7 days from now
+    const expiresAt = new Date()
+    expiresAt.setDate(expiresAt.getDate() + 7)
+
     const demand = await db.demand.create({
       data: {
         title: fullTitle,
@@ -179,6 +207,7 @@ export async function POST(request: Request) {
         whatsapp: whatsapp.replace(/\s/g, ''),
         photo: photo || null,
         annonceType: isVente ? 'vends' : 'cherche',
+        expiresAt,
         userId: session.userId,
       },
     })

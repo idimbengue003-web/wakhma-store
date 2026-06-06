@@ -19,11 +19,15 @@ interface Demand {
   photo?: string | null
   whatsapp: string
   whatsappRevealed: boolean
+  status: string
+  annonceType: string
+  expiresAt?: string | null
   createdAt: string
   userName: string
   userSubscriptionTier?: string | null
   userType?: string
-  annonceType?: string
+  userSalesCount?: number
+  userPurchasesCount?: number
   hasPhoneInText: boolean
 }
 

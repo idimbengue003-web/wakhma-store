@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Search, ArrowRight, Zap, Shield, TrendingUp, MapPin, MessageCircle } from 'lucide-react'
+import { Search, ArrowRight, Zap, Shield, TrendingUp, MapPin, MessageCircle, CheckCircle } from 'lucide-react'
 import { CATEGORIES, CATEGORY_EMOJIS, formatFCFA, timeAgo } from '@/lib/constants'
 import { useState, useEffect, useMemo } from 'react'
 
@@ -11,14 +11,20 @@ interface Annonce {
   description: string
   category: string
   budget: number
+  price: number
   quartier: string
   urgency: string
   photo?: string | null
   whatsapp: string
   whatsappRevealed: boolean
+  status: string
+  annonceType: string
+  expiresAt: string | null
   createdAt: string
   userName: string
   userSubscriptionTier?: string | null
+  userSalesCount: number
+  userPurchasesCount: number
 }
 
 export default function HomePage() {
@@ -227,9 +233,17 @@ export default function HomePage() {
   )
 }
 
-/* Lightweight AnnonceCard - no backdrop-blur, minimal transitions */
+/* Lightweight AnnonceCard with badges and sales count */
 function AnnonceCard({ annonce }: { annonce: Annonce }) {
   const emoji = CATEGORY_EMOJIS[annonce.category] || '📦'
+  const isVente = annonce.annonceType === 'vends'
+
+  // Badge based on subscription
+  const subscriptionBadge = annonce.userSubscriptionTier === 'king'
+    ? '⭐ KING VIP'
+    : annonce.userSubscriptionTier === 'diambar'
+      ? '💎 Diambar'
+      : null
 
   return (
     <div className="annonce-card bg-white rounded-xl border border-gray-200 overflow-hidden group cursor-pointer">
@@ -246,6 +260,11 @@ function AnnonceCard({ annonce }: { annonce: Annonce }) {
           <span className="absolute top-2 left-2 px-2 py-0.5 bg-white/90 rounded-md text-[10px] font-semibold text-gray-700">
             {emoji} {annonce.category}
           </span>
+          {isVente && (
+            <span className="absolute top-2 right-2 px-2 py-0.5 bg-orange text-white rounded-md text-[10px] font-bold">
+              Je veux vendre
+            </span>
+          )}
         </div>
       ) : (
         <div className="relative h-24 sm:h-28 bg-orange-bg flex items-center justify-center">
@@ -253,6 +272,26 @@ function AnnonceCard({ annonce }: { annonce: Annonce }) {
           <span className="absolute top-2 left-2 px-2 py-0.5 bg-white/90 rounded-md text-[10px] font-semibold text-gray-700">
             {annonce.category}
           </span>
+          {isVente && (
+            <span className="absolute top-2 right-2 px-2 py-0.5 bg-orange text-white rounded-md text-[10px] font-bold">
+              Je veux vendre
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Badges row */}
+      {(isVente || subscriptionBadge) && (
+        <div className="flex items-center gap-1 px-3 pt-2">
+          {subscriptionBadge && (
+            <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+              annonce.userSubscriptionTier === 'king'
+                ? 'bg-yellow-100 text-yellow-700'
+                : 'bg-blue-50 text-blue-700'
+            }`}>
+              {subscriptionBadge}
+            </span>
+          )}
         </div>
       )}
 
@@ -261,9 +300,9 @@ function AnnonceCard({ annonce }: { annonce: Annonce }) {
           {annonce.title}
         </h3>
 
-        {annonce.budget > 0 && (
+        {(annonce.price > 0 || annonce.budget > 0) && (
           <div className="text-orange text-lg font-extrabold tracking-tight">
-            {formatFCFA(annonce.budget)}
+            {annonce.price > 0 ? formatFCFA(annonce.price) : formatFCFA(annonce.budget)}
           </div>
         )}
 
@@ -273,6 +312,22 @@ function AnnonceCard({ annonce }: { annonce: Annonce }) {
           <span>•</span>
           <span>{timeAgo(new Date(annonce.createdAt))}</span>
         </div>
+
+        {/* Sales/purchases count */}
+        {(annonce.userSalesCount > 0 || annonce.userPurchasesCount > 0) && (
+          <div className="flex items-center gap-2 text-[10px]">
+            {annonce.userSalesCount > 0 && (
+              <span className="flex items-center gap-0.5 text-green-600">
+                <CheckCircle className="w-2.5 h-2.5" /> {annonce.userSalesCount} vente{annonce.userSalesCount > 1 ? 's' : ''}
+              </span>
+            )}
+            {annonce.userPurchasesCount > 0 && (
+              <span className="flex items-center gap-0.5 text-blue-500">
+                <CheckCircle className="w-2.5 h-2.5" /> {annonce.userPurchasesCount} achat{annonce.userPurchasesCount > 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
+        )}
 
         {annonce.whatsappRevealed ? (
           <a

@@ -16,6 +16,8 @@ async function ensureTables() {
       "subscriptionTier" TEXT,
       "subscriptionStart" TEXT,
       "subscriptionEnd" TEXT,
+      "salesCount" INTEGER NOT NULL DEFAULT 0,
+      "purchasesCount" INTEGER NOT NULL DEFAULT 0,
       "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
   `)
@@ -34,6 +36,7 @@ async function ensureTables() {
       "whatsapp" TEXT NOT NULL,
       "status" TEXT NOT NULL DEFAULT 'active',
       "annonceType" TEXT NOT NULL DEFAULT 'cherche',
+      "expiresAt" TIMESTAMP(3),
       "userId" TEXT NOT NULL,
       "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
@@ -90,13 +93,24 @@ async function ensureTables() {
 
   // Add missing columns if tables already exist
   try { await db.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "userType" TEXT NOT NULL DEFAULT 'acheteur';`); } catch { /* already exists */ }
+  try { await db.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "salesCount" INTEGER NOT NULL DEFAULT 0;`); } catch { /* already exists */ }
+  try { await db.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "purchasesCount" INTEGER NOT NULL DEFAULT 0;`); } catch { /* already exists */ }
   try { await db.$executeRawUnsafe(`ALTER TABLE "Demand" ADD COLUMN IF NOT EXISTS "price" INTEGER NOT NULL DEFAULT 0;`); } catch { /* already exists */ }
   try { await db.$executeRawUnsafe(`ALTER TABLE "Demand" ADD COLUMN IF NOT EXISTS "annonceType" TEXT NOT NULL DEFAULT 'cherche';`); } catch { /* already exists */ }
+  try { await db.$executeRawUnsafe(`ALTER TABLE "Demand" ADD COLUMN IF NOT EXISTS "expiresAt" TIMESTAMP(3);`); } catch { /* already exists */ }
+
+  // Set expiresAt for existing active demands that don't have one (7 days from creation)
+  await db.$executeRawUnsafe(`
+    UPDATE "Demand"
+    SET "expiresAt" = "createdAt" + INTERVAL '7 days'
+    WHERE "expiresAt" IS NULL AND "status" = 'active';
+  `)
 
   // Create indexes if they don't exist
   await db.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "Demand_userId_idx" ON "Demand"("userId");`)
   await db.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "Reveal_userId_idx" ON "Reveal"("userId");`)
   await db.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "Reveal_demandId_idx" ON "Reveal"("demandId");`)
+  await db.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "Demand_expiresAt_idx" ON "Demand"("expiresAt");`)
 }
 
 export async function POST() {
@@ -104,13 +118,22 @@ export async function POST() {
     // Step 1: Create tables
     await ensureTables()
 
-    // Step 2: Check if admin already exists
+    // Step 2: Auto-expire annonces older than 7 days
+    await db.$executeRawUnsafe(`
+      UPDATE "Demand"
+      SET "status" = 'expired'
+      WHERE "status" = 'active'
+      AND "expiresAt" IS NOT NULL
+      AND "expiresAt" < CURRENT_TIMESTAMP;
+    `)
+
+    // Step 3: Check if admin already exists
     const existing = await db.user.findUnique({ where: { phone: '770000000' } })
     if (existing) {
       return NextResponse.json({ message: 'Admin déjà créé', userId: existing.id })
     }
 
-    // Step 3: Create admin
+    // Step 4: Create admin
     const hashedPassword = hashPassword('wakhma2024')
 
     const admin = await db.user.create({
@@ -120,10 +143,15 @@ export async function POST() {
         password: hashedPassword,
         role: 'admin',
         points: 999999,
+        salesCount: 0,
+        purchasesCount: 0,
       },
     })
 
-    // Step 4: Create demo demands
+    // Step 5: Create demo demands with expiresAt
+    const now = new Date()
+    const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+
     const demoDemands = [
       {
         title: 'Je cherche un iPhone 14 Pro Max',
@@ -134,6 +162,7 @@ export async function POST() {
         urgency: 'flexible',
         whatsapp: '771234567',
         userId: admin.id,
+        expiresAt: sevenDaysFromNow,
       },
       {
         title: 'Je cherche un frigo Samsung double porte',
@@ -144,6 +173,7 @@ export async function POST() {
         urgency: '1semaine',
         whatsapp: '772345678',
         userId: admin.id,
+        expiresAt: sevenDaysFromNow,
       },
       {
         title: 'Je cherche un climatiseur split 12000 BTU',
@@ -154,6 +184,7 @@ export async function POST() {
         urgency: 'urgent',
         whatsapp: '773456789',
         userId: admin.id,
+        expiresAt: sevenDaysFromNow,
       },
       {
         title: 'Je cherche un ordinateur portable pour études',
@@ -164,6 +195,7 @@ export async function POST() {
         urgency: '2jours',
         whatsapp: '774567890',
         userId: admin.id,
+        expiresAt: sevenDaysFromNow,
       },
       {
         title: 'Je cherche un canapé 3 places',
@@ -174,6 +206,7 @@ export async function POST() {
         urgency: 'flexible',
         whatsapp: '775678901',
         userId: admin.id,
+        expiresAt: sevenDaysFromNow,
       },
     ]
 

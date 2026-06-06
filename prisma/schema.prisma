@@ -18,6 +18,8 @@ model User {
   subscriptionTier String?
   subscriptionStart String?
   subscriptionEnd   String?
+  salesCount       Int       @default(0)   // nombre de ventes réalisées
+  purchasesCount   Int       @default(0)   // nombre d'achats réalisés
   createdAt        DateTime  @default(now())
   demands          Demand[]
   reveals          Reveal[]
@@ -34,8 +36,9 @@ model Demand {
   urgency     String    @default("flexible")
   photo       String?
   whatsapp    String
-  status      String    @default("active")
+  status      String    @default("active") // active, expired, sold
   annonceType String    @default("cherche")  // cherche ou vends
+  expiresAt   DateTime  // date d'expiration (7 jours après création)
   userId      String
   user        User      @relation(fields: [userId], references: [id])
   createdAt   DateTime  @default(now())

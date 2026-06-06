@@ -120,8 +120,8 @@ export default function DeposerPage() {
           <h2 className="text-xl font-bold text-gray-900 mb-2">Annonce publiée !</h2>
           <p className="text-sm text-gray-500 mb-6">
             {annonceType === 'vends'
-              ? 'Ton annonce de vente est visible par tous les acheteurs de Dakar.'
-              : 'Ton annonce est visible par tous les vendeurs de Dakar.'}
+              ? 'Ton annonce de vente est visible par tous les acheteurs de Dakar. Elle expirera dans 7 jours, renouvelable depuis ton profil.'
+              : 'Ton annonce est visible par tous les vendeurs de Dakar. Elle expirera dans 7 jours, renouvelable depuis ton profil.'}
           </p>
           <div className="flex flex-col sm:flex-row gap-2 justify-center">
             <Link href="/annonces" className="px-5 py-2.5 bg-orange hover:bg-orange-dark text-white rounded-xl font-medium text-sm">

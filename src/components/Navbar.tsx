@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/store'
-import { Menu, X, Store, LogOut, User } from 'lucide-react'
+import { Menu, X, Store, LogOut, User, Zap } from 'lucide-react'
 import { useState, useCallback } from 'react'
 
 export function Navbar() {
@@ -48,13 +48,23 @@ export function Navbar() {
                   {user.subscriptionTier === 'king' && <span className="text-xs">⭐</span>}
                   {user.subscriptionTier === 'diambar' && <span className="text-xs">💎</span>}
                 </button>
-                <div className="absolute right-0 mt-1 w-44 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible">
+                <div className="absolute right-0 mt-1 w-52 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible">
                   <div className="px-3 py-2 border-b border-gray-100">
                     <p className="text-xs font-medium text-gray-900 truncate">{user.name}</p>
-                    <p className="text-[10px] text-gray-500 capitalize">{user.role}</p>
+                    <p className="text-[10px] text-gray-500 capitalize">{user.userType === 'vendeur' ? 'Vendeur' : 'Acheteur'}</p>
+                    <div className="flex items-center gap-1 mt-1 text-[10px] text-orange font-medium">
+                      <Zap className="w-3 h-3" /> {user.points.toLocaleString('fr-FR')} pts
+                    </div>
                   </div>
-                  <Link href="/annonces" className="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50">Mes annonces</Link>
-                  <Link href="/recharge" className="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50">Recharger</Link>
+                  <Link href="/profil" className="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50">
+                    Mon profil
+                  </Link>
+                  <Link href="/annonces" className="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50">
+                    Annonces
+                  </Link>
+                  <Link href="/recharge" className="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50">
+                    Recharger
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 flex items-center gap-1.5"
@@ -93,8 +103,12 @@ export function Navbar() {
             </Link>
             {user ? (
               <>
-                <Link href="/annonces" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">Mes annonces</Link>
-                <Link href="/recharge" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">Recharger</Link>
+                <Link href="/profil" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                  Mon profil
+                </Link>
+                <Link href="/recharge" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                  Recharger
+                </Link>
                 <button onClick={() => { handleLogout(); setMobileOpen(false) }} className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50">
                   Déconnexion
                 </button>

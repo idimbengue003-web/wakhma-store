@@ -52,6 +52,8 @@ export async function POST(request: Request) {
         role: 'user',
         userType: validType,
         points: 0,
+        salesCount: 0,
+        purchasesCount: 0,
       },
     })
 
@@ -72,6 +74,8 @@ export async function POST(request: Request) {
         subscriptionTier: user.subscriptionTier,
         points: user.points,
         userType: user.userType,
+        salesCount: user.salesCount,
+        purchasesCount: user.purchasesCount,
       },
     })
 
