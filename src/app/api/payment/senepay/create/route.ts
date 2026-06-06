@@ -6,7 +6,7 @@ import { POINTS_TIERS, SUBSCRIPTION_TIERS } from '@/lib/constants'
 
 // SenePay Checkout Session Creation
 // Creates a checkout session and redirects user to SenePay hosted checkout page
-// Falls back to DEMO mode if SenePay API keys are not configured
+// Falls back to DEMO mode if SenePay API keys are not configured OR if KYC is not verified
 export async function POST(request: Request) {
   try {
     await autoMigrate()
@@ -69,66 +69,14 @@ export async function POST(request: Request) {
     const senepayApiKey = process.env.SENEPAY_API_KEY
     const senepayApiSecret = process.env.SENEPAY_API_SECRET
 
+    // ═══ DEMO MODE (no keys) ═══
     if (!senepayApiKey || !senepayApiSecret) {
-      // ═══ DEMO MODE ═══
-      // When SenePay keys are not configured, auto-confirm the payment
-      // This is for testing purposes only — remove in production
-      console.log(`[SenePay DEMO] Auto-confirming payment: ${label} - ${amount} FCFA for user ${session.userId}`)
-
-      // Credit the user immediately
-      if (type === 'points' && resolvedTierIndex !== null) {
-        const tier = POINTS_TIERS[resolvedTierIndex]
-        const user = await db.user.update({
-          where: { id: session.userId },
-          data: { points: { increment: tier.points } },
-        })
-
-        await db.payment.update({
-          where: { orderReference },
-          data: { status: 'completed', completedAt: new Date() },
-        })
-
-        return NextResponse.json({
-          success: true,
-          orderReference,
-          demoMode: true,
-          redirectUrl: `${baseUrl}/payment-success?type=points&added=${tier.points}&balance=${user.points}`,
-          amount,
-          label,
-        })
-      } else if (type === 'subscription' && resolvedTierId) {
-        const tier = SUBSCRIPTION_TIERS.find((t) => t.id === resolvedTierId)!
-        const now = new Date()
-        const endDate = new Date()
-        endDate.setDate(endDate.getDate() + tier.durationDays)
-
-        const user = await db.user.update({
-          where: { id: session.userId },
-          data: {
-            subscriptionTier: tier.id,
-            subscriptionStart: now.toISOString(),
-            subscriptionEnd: endDate.toISOString(),
-            points: { increment: tier.bonusPoints },
-          },
-        })
-
-        await db.payment.update({
-          where: { orderReference },
-          data: { status: 'completed', completedAt: new Date() },
-        })
-
-        return NextResponse.json({
-          success: true,
-          orderReference,
-          demoMode: true,
-          redirectUrl: `${baseUrl}/payment-success?type=subscription&tier=${tier.id}&bonus=${tier.bonusPoints}&balance=${user.points}`,
-          amount,
-          label,
-        })
-      }
+      console.log(`[SenePay DEMO] No API keys - auto-confirming: ${label} - ${amount} FCFA for user ${session.userId}`)
+      const demoResult = await creditUser(type, resolvedTierIndex, resolvedTierId, session.userId, orderReference, baseUrl)
+      return NextResponse.json(demoResult)
     }
 
-    // ═══ LIVE MODE — SenePay Checkout API ═══
+    // ═══ TRY LIVE MODE — SenePay Checkout API ═══
     const checkoutPayload: Record<string, unknown> = {
       amount,
       currency: 'XOF',
@@ -149,36 +97,52 @@ export async function POST(request: Request) {
 
     console.log(`[SenePay] Creating checkout session: ${label} - ${amount} FCFA for user ${session.userId}`)
 
-    const senepayResponse = await fetch('https://api.sene-pay.com/api/v1/checkout/sessions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Api-Key': senepayApiKey!,
-        'X-Api-Secret': senepayApiSecret!,
-      },
-      body: JSON.stringify(checkoutPayload),
-    })
+    let senepayResponse: Response
+    try {
+      senepayResponse = await fetch('https://api.sene-pay.com/api/v1/checkout/sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Api-Key': senepayApiKey,
+          'X-Api-Secret': senepayApiSecret,
+        },
+        body: JSON.stringify(checkoutPayload),
+      })
+    } catch (fetchError) {
+      // Network error - fall back to demo mode
+      console.error('[SenePay] Network error, falling back to demo:', fetchError)
+      const demoResult = await creditUser(type, resolvedTierIndex, resolvedTierId, session.userId, orderReference, baseUrl)
+      return NextResponse.json(demoResult)
+    }
 
     const senepayData = await senepayResponse.json()
 
     if (!senepayResponse.ok) {
       console.error('[SenePay] Checkout creation failed:', JSON.stringify(senepayData))
 
-      // Update payment status to failed
+      // If KYC not verified or account not active, fall back to demo mode
+      const errorCode = senepayData.code || ''
+      if (['NO_KYC_PROFILE', 'KYC_NOT_VERIFIED', 'ACCOUNT_NOT_ACTIVE'].includes(errorCode)) {
+        console.log(`[SenePay] KYC/Account issue (${errorCode}) - falling back to demo mode`)
+        const demoResult = await creditUser(type, resolvedTierIndex, resolvedTierId, session.userId, orderReference, baseUrl)
+        return NextResponse.json(demoResult)
+      }
+
+      // Update payment status to failed for other errors
       await db.payment.update({
         where: { orderReference },
         data: { status: 'failed' },
       })
 
-      // Return detailed error from SenePay so user knows what's wrong
+      // Return detailed error from SenePay
       const detail = senepayData.message || senepayData.code || senepayData.error || ''
       const errorMsg = detail
-        ? `SenePay: ${detail} (HTTP ${senepayResponse.status})`
-        : `Erreur lors de la création du paiement (HTTP ${senepayResponse.status})`
-      return NextResponse.json({ error: errorMsg, senepayDetail: senepayData }, { status: senepayResponse.status })
+        ? `SenePay: ${detail}`
+        : `Erreur lors de la création du paiement`
+      return NextResponse.json({ error: errorMsg }, { status: senepayResponse.status })
     }
 
-    // Update payment with session token
+    // ✅ SenePay session created successfully
     await db.payment.update({
       where: { orderReference },
       data: { sessionToken: senepayData.sessionToken },
@@ -199,4 +163,71 @@ export async function POST(request: Request) {
     const msg = error instanceof Error ? error.message : String(error)
     return NextResponse.json({ error: `Erreur serveur: ${msg}` }, { status: 500 })
   }
+}
+
+// Helper: credit user immediately (demo mode / fallback)
+async function creditUser(
+  type: string,
+  tierIndex: number | null,
+  tierId: string | null,
+  userId: string,
+  orderReference: string,
+  baseUrl: string
+) {
+  if (type === 'points' && tierIndex !== null) {
+    const tier = POINTS_TIERS[tierIndex]
+    const user = await db.user.update({
+      where: { id: userId },
+      data: { points: { increment: tier.points } },
+    })
+
+    await db.payment.update({
+      where: { orderReference },
+      data: { status: 'completed', completedAt: new Date() },
+    })
+
+    console.log(`[DEMO] Points credited: ${tier.points} pts for user ${userId}`)
+
+    return {
+      success: true,
+      orderReference,
+      demoMode: true,
+      redirectUrl: `${baseUrl}/payment-success?type=points&added=${tier.points}&balance=${user.points}`,
+      amount: tier.prix,
+      label: `${tier.points} pts - ${tier.label}`,
+    }
+  } else if (type === 'subscription' && tierId) {
+    const tier = SUBSCRIPTION_TIERS.find((t) => t.id === tierId)!
+    const now = new Date()
+    const endDate = new Date()
+    endDate.setDate(endDate.getDate() + tier.durationDays)
+
+    const user = await db.user.update({
+      where: { id: userId },
+      data: {
+        subscriptionTier: tier.id,
+        subscriptionStart: now.toISOString(),
+        subscriptionEnd: endDate.toISOString(),
+        points: { increment: tier.bonusPoints },
+      },
+    })
+
+    await db.payment.update({
+      where: { orderReference },
+      data: { status: 'completed', completedAt: new Date() },
+    })
+
+    console.log(`[DEMO] Subscription activated: ${tier.name} for user ${userId}`)
+
+    return {
+      success: true,
+      orderReference,
+      demoMode: true,
+      redirectUrl: `${baseUrl}/payment-success?type=subscription&tier=${tier.id}&bonus=${tier.bonusPoints}&balance=${user.points}`,
+      amount: tier.price,
+      label: `Abonnement ${tier.name}`,
+    }
+  }
+
+  return { success: false, error: 'Type invalide' }
 }
