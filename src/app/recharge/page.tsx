@@ -37,10 +37,10 @@ function RechargeContent() {
         body: JSON.stringify({ type, tierIndex, tierId }),
       })
       const data = await res.json()
-      if (res.ok && data.checkoutUrl) {
-        // Redirect user to SenePay hosted checkout page
-        // Supports Wave, Orange Money, Free Money, MTN, etc.
-        window.location.href = data.checkoutUrl
+      if (res.ok && (data.checkoutUrl || data.redirectUrl)) {
+        // Live mode: redirect to SenePay checkout page
+        // Demo mode: redirect directly to success page (auto-confirmed)
+        window.location.href = data.checkoutUrl || data.redirectUrl
       } else {
         setError(data.error || 'Erreur lors de la création du paiement')
         setPayLoading(null)
@@ -83,6 +83,7 @@ function RechargeContent() {
         <CreditCard className="w-4 h-4 text-orange shrink-0" />
         <span>
           Paiement sécurisé via <strong>SenePay</strong> — Wave, Orange Money, Free Money et plus encore
+          <span className="text-orange font-semibold ml-1">(Mode test actif)</span>
         </span>
       </div>
 

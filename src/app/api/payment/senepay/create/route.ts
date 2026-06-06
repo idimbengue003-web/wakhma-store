@@ -6,6 +6,7 @@ import { POINTS_TIERS, SUBSCRIPTION_TIERS } from '@/lib/constants'
 
 // SenePay Checkout Session Creation
 // Creates a checkout session and redirects user to SenePay hosted checkout page
+// Falls back to DEMO mode if SenePay API keys are not configured
 export async function POST(request: Request) {
   try {
     await autoMigrate()
@@ -64,15 +65,70 @@ export async function POST(request: Request) {
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://wakhmastore.com'
 
-    // Call SenePay Checkout API to create a session
+    // ─── Check if SenePay API keys are configured ───
     const senepayApiKey = process.env.SENEPAY_API_KEY
     const senepayApiSecret = process.env.SENEPAY_API_SECRET
 
     if (!senepayApiKey || !senepayApiSecret) {
-      console.error('[SenePay] Missing API credentials')
-      return NextResponse.json({ error: 'Paiement non configuré. Contactez le support.' }, { status: 500 })
+      // ═══ DEMO MODE ═══
+      // When SenePay keys are not configured, auto-confirm the payment
+      // This is for testing purposes only — remove in production
+      console.log(`[SenePay DEMO] Auto-confirming payment: ${label} - ${amount} FCFA for user ${session.userId}`)
+
+      // Credit the user immediately
+      if (type === 'points' && resolvedTierIndex !== null) {
+        const tier = POINTS_TIERS[resolvedTierIndex]
+        const user = await db.user.update({
+          where: { id: session.userId },
+          data: { points: { increment: tier.points } },
+        })
+
+        await db.payment.update({
+          where: { orderReference },
+          data: { status: 'completed', completedAt: new Date() },
+        })
+
+        return NextResponse.json({
+          success: true,
+          orderReference,
+          demoMode: true,
+          redirectUrl: `${baseUrl}/payment-success?type=points&added=${tier.points}&balance=${user.points}`,
+          amount,
+          label,
+        })
+      } else if (type === 'subscription' && resolvedTierId) {
+        const tier = SUBSCRIPTION_TIERS.find((t) => t.id === resolvedTierId)!
+        const now = new Date()
+        const endDate = new Date()
+        endDate.setDate(endDate.getDate() + tier.durationDays)
+
+        const user = await db.user.update({
+          where: { id: session.userId },
+          data: {
+            subscriptionTier: tier.id,
+            subscriptionStart: now.toISOString(),
+            subscriptionEnd: endDate.toISOString(),
+            points: { increment: tier.bonusPoints },
+          },
+        })
+
+        await db.payment.update({
+          where: { orderReference },
+          data: { status: 'completed', completedAt: new Date() },
+        })
+
+        return NextResponse.json({
+          success: true,
+          orderReference,
+          demoMode: true,
+          redirectUrl: `${baseUrl}/payment-success?type=subscription&tier=${tier.id}&bonus=${tier.bonusPoints}&balance=${user.points}`,
+          amount,
+          label,
+        })
+      }
     }
 
+    // ═══ LIVE MODE — SenePay Checkout API ═══
     const checkoutPayload: Record<string, unknown> = {
       amount,
       currency: 'XOF',
@@ -97,8 +153,8 @@ export async function POST(request: Request) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Api-Key': senepayApiKey,
-        'X-Api-Secret': senepayApiSecret,
+        'X-Api-Key': senepayApiKey!,
+        'X-Api-Secret': senepayApiSecret!,
       },
       body: JSON.stringify(checkoutPayload),
     })
