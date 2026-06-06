@@ -1,5 +1,5 @@
 export const REVEAL_PRICES: Record<string, number> = {
-  user: 1500,
+  user: 1000,
   pro: 1000,
   king: 500,
   admin: 0,
@@ -15,7 +15,7 @@ export const SUBSCRIPTION_TIERS = [
     bonusPoints: 30000,
     badge: '💎',
     features: [
-      'Révélation à 1 000 pts (au lieu de 1 500)',
+      'Révélation à 1 000 pts',
       '30 000 points offerts',
       'Badge 💎 Diambar',
       'Annonces visibles en priorité',
@@ -69,7 +69,6 @@ export const URGENCY_OPTIONS = [
 
 export function getRevealPrice(role: string, subscriptionTier?: string | null): number {
   if (subscriptionTier === 'king') return REVEAL_PRICES.king
-  if (role === 'pro' || subscriptionTier === 'diambar') return REVEAL_PRICES.pro
   return REVEAL_PRICES.user
 }
 
