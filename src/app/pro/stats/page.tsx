@@ -43,7 +43,7 @@ export default function ProStatsPage() {
         <StatCard
           icon={<Calendar className="w-5 h-5 text-purple-600" />}
           label="Abonnement"
-          value={user?.subscriptionTier === 'king' ? 'KING VIP' : user?.subscriptionTier === 'diambar' ? 'Diambar' : 'Aucun'}
+          value={user?.subscriptionTier === 'king' ? 'VIP KING' : user?.subscriptionTier === 'diambar' ? 'Diambar' : 'Aucun'}
           bgColor="bg-purple-100"
         />
       </div>
@@ -56,7 +56,7 @@ export default function ProStatsPage() {
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-sm text-gray-500">Abonnement</span>
               <span className="text-sm font-semibold text-gray-900">
-                {user.subscriptionTier === 'king' ? '⭐ KING VIP' : '💎 Diambar'}
+                {user.subscriptionTier === 'king' ? '⭐ VIP KING' : '💎 Diambar'}
               </span>
             </div>
             <div className="flex justify-between items-center py-2 border-b border-gray-100">

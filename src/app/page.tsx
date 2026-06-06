@@ -206,7 +206,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <TrustCard icon={<Zap className="w-5 h-5" />} title="Rapide" description="Poste ta demande en 30 secondes et reçois des offres rapidement." />
-            <TrustCard icon={<Shield className="w-5 h-5" />} title="Fiable" description="Vendeurs avec abonnement Diambar ou KING VIP. Annonces vérifiées." />
+            <TrustCard icon={<Shield className="w-5 h-5" />} title="Fiable" description="Vendeurs avec abonnement Diambar ou VIP KING. Annonces vérifiées." />
             <TrustCard icon={<TrendingUp className="w-5 h-5" />} title="Efficace" description="Passe directement par WhatsApp. Pas d'intermédiaire." />
           </div>
         </div>
@@ -240,7 +240,7 @@ function AnnonceCard({ annonce }: { annonce: Annonce }) {
 
   // Badge based on subscription
   const subscriptionBadge = annonce.userSubscriptionTier === 'king'
-    ? '⭐ KING VIP'
+    ? '⭐ VIP KING'
     : annonce.userSubscriptionTier === 'diambar'
       ? '💎 Diambar'
       : null

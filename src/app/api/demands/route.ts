@@ -144,7 +144,7 @@ export async function POST(request: Request) {
 
       if (maxAnnonces === 0) {
         return NextResponse.json(
-          { error: 'Vendeur simple : tu ne peux pas poster d\'annonces. Prends un abonnement Diambar 💎 ou KING VIP ⭐ pour poster jusqu\'à 3 annonces !' },
+          { error: 'Vendeur simple : tu ne peux pas poster d\'annonces. Prends un abonnement Diambar 💎 ou VIP KING ⭐ pour poster jusqu\'à 3 annonces !' },
           { status: 403 }
         )
       }
@@ -160,7 +160,7 @@ export async function POST(request: Request) {
 
       if (activeVentes >= maxAnnonces) {
         return NextResponse.json(
-          { error: `Limite de ${maxAnnonces} annonces "Je vends" atteinte. Supprime une annonce ou passe en KING VIP !` },
+          { error: `Limite de ${maxAnnonces} annonces "Je vends" atteinte. Supprime une annonce ou passe en VIP KING !` },
           { status: 400 }
         )
       }

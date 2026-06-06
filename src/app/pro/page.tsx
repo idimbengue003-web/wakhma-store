@@ -127,7 +127,7 @@ export default function ProDashboard() {
             <div>
               <p className="text-sm text-gray-500">Abonnement</p>
               <p className="text-xl font-bold text-gray-900">
-                {user?.subscriptionTier === 'king' ? '⭐ KING VIP' : user?.subscriptionTier === 'diambar' ? '💎 Diambar' : 'Aucun'}
+                {user?.subscriptionTier === 'king' ? '⭐ VIP KING' : user?.subscriptionTier === 'diambar' ? '💎 Diambar' : 'Aucun'}
               </p>
             </div>
           </div>

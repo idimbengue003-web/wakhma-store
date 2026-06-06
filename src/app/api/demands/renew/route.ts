@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
       if (maxAnnonces === 0) {
         return NextResponse.json(
-          { error: 'Ton abonnement a expiré. Prends un abonnement Diambar 💎 ou KING VIP ⭐ pour renouveler tes annonces de vente.' },
+          { error: 'Ton abonnement a expiré. Prends un abonnement Diambar 💎 ou VIP KING ⭐ pour renouveler tes annonces de vente.' },
           { status: 403 }
         )
       }

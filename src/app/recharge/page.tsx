@@ -136,7 +136,7 @@ export default function RechargePage() {
             </span>
             {user.subscriptionTier && (
               <span className="text-sm">
-                {user.subscriptionTier === 'king' ? '⭐ KING VIP' : '💎 Diambar'}
+                {user.subscriptionTier === 'king' ? '⭐ VIP KING' : '💎 Diambar'}
               </span>
             )}
           </div>
@@ -313,7 +313,7 @@ export default function RechargePage() {
                   }`}
                 >
                   {tier.id === 'king' ? (
-                    <span className="flex items-center justify-center gap-1.5"><Crown className="w-4 h-4" /> Devenir KING VIP</span>
+                    <span className="flex items-center justify-center gap-1.5"><Crown className="w-4 h-4" /> Devenir VIP KING</span>
                   ) : (
                     <span className="flex items-center justify-center gap-1.5"><Star className="w-4 h-4" /> Devenir Diambar</span>
                   )}

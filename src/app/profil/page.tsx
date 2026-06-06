@@ -143,7 +143,7 @@ export default function ProfilPage() {
   const isVendeur = user.userType === 'vendeur'
   const hasSubscription = user.subscriptionTier === 'diambar' || user.subscriptionTier === 'king'
   const subscriptionBadge = user.subscriptionTier === 'king'
-    ? '⭐ KING VIP'
+    ? '⭐ VIP KING'
     : user.subscriptionTier === 'diambar'
       ? '💎 Diambar'
       : null

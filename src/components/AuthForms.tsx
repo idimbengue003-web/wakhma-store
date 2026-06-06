@@ -169,7 +169,7 @@ export function RegisterForm() {
         </div>
         {userType === 'vendeur' && (
           <p className="text-[11px] text-amber-600 mt-2 bg-amber-50 p-2 rounded-lg">
-            💡 Vendeur simple : tu peux répondre aux demandes. Pour poster des annonces &quot;Je vends&quot;, prends un abonnement Diambar ou KING VIP.
+            💡 Vendeur simple : tu peux répondre aux demandes. Pour poster des annonces &quot;Je vends&quot;, prends un abonnement Diambar ou VIP KING.
           </p>
         )}
       </div>

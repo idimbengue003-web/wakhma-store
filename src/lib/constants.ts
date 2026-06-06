@@ -8,7 +8,7 @@ export const REVEAL_PRICES: Record<string, number> = {
 export const VENDOR_ANNONCE_LIMITS: Record<string, number> = {
   none: 0,       // vendeur simple = 0 annonces
   diambar: 3,    // Diambar = 3 annonces
-  king: 3,       // KING VIP = 3 annonces
+  king: 3,       // VIP KING = 3 annonces
 }
 
 export const SUBSCRIPTION_TIERS = [
@@ -30,7 +30,7 @@ export const SUBSCRIPTION_TIERS = [
   },
   {
     id: 'king',
-    name: 'KING VIP',
+    name: 'VIP KING',
     price: 10000,
     durationDays: 30,
     revealPrice: 500,
@@ -39,7 +39,7 @@ export const SUBSCRIPTION_TIERS = [
     features: [
       'Révélation à 500 pts (meilleur prix !)',
       '75 000 points offerts',
-      'Badge ⭐ KING VIP',
+      'Badge ⭐ VIP KING',
       '3 annonces "Je vends" actives',
       'Nom en étoile dans les messages WhatsApp',
     ],

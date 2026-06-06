@@ -26,7 +26,7 @@ export function AnnonceCard({ annonce }: { annonce: Annonce }) {
 
   // Badge based on subscription
   const subscriptionBadge = annonce.userSubscriptionTier === 'king'
-    ? '⭐ KING VIP'
+    ? '⭐ VIP KING'
     : annonce.userSubscriptionTier === 'diambar'
       ? '💎 Diambar'
       : null

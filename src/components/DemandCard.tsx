@@ -54,7 +54,7 @@ export function DemandCard({ demand, onReveal }: DemandCardProps) {
 
   // Badge based on subscription
   const subscriptionBadge = demand.userSubscriptionTier === 'king'
-    ? '⭐ KING VIP'
+    ? '⭐ VIP KING'
     : demand.userSubscriptionTier === 'diambar'
       ? '💎 Diambar'
       : null
