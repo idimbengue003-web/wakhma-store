@@ -3,10 +3,11 @@
 :root {
   --background: #ffffff;
   --foreground: #1a1a1a;
-  --orange: #FF6E14;
-  --orange-light: #FF8C3A;
-  --orange-dark: #E55A00;
-  --orange-bg: #FFF4EB;
+  /* Wakhma original blue/green theme */
+  --orange: #00E676;
+  --orange-light: #69F0AE;
+  --orange-dark: #00C853;
+  --orange-bg: #E8F5E9;
 }
 
 @theme inline {
@@ -24,13 +25,13 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Leboncoin-style search bar */
+/* Search bar shadow */
 .search-bar-shadow {
-  box-shadow: 0 4px 24px rgba(255, 110, 20, 0.18), 0 1.5px 6px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 24px rgba(0, 230, 118, 0.18), 0 1.5px 6px rgba(0,0,0,0.06);
 }
 
 .search-bar-shadow:focus-within {
-  box-shadow: 0 6px 32px rgba(255, 110, 20, 0.28), 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 32px rgba(0, 230, 118, 0.28), 0 2px 8px rgba(0,0,0,0.08);
 }
 
 /* Card hover */
@@ -39,12 +40,12 @@ body {
 }
 .annonce-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+  box-shadow: 0 8px 24px rgba(0, 230, 118, 0.10);
 }
 
 /* Price shimmer */
 .price-orange {
-  background: linear-gradient(135deg, #FF6E14 0%, #FF8C3A 100%);
+  background: linear-gradient(135deg, #00E676 0%, #69F0AE 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

@@ -9,9 +9,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  turbopack: {
-    root: '/home/z/my-project/wakhma-store',
-  },
 };
 
 export default nextConfig;
