@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --orange: #FF6E14;
+  --orange-light: #FF8C3A;
+  --orange-dark: #E55A00;
+  --orange-bg: #FFF4EB;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-orange: var(--orange);
+  --color-orange-light: var(--orange-light);
+  --color-orange-dark: var(--orange-dark);
+  --color-orange-bg: var(--orange-bg);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Leboncoin-style search bar */
+.search-bar-shadow {
+  box-shadow: 0 4px 24px rgba(255, 110, 20, 0.18), 0 1.5px 6px rgba(0,0,0,0.06);
+}
+
+.search-bar-shadow:focus-within {
+  box-shadow: 0 6px 32px rgba(255, 110, 20, 0.28), 0 2px 8px rgba(0,0,0,0.08);
+}
+
+/* Card hover */
+.annonce-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.annonce-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+}
+
+/* Price shimmer */
+.price-orange {
+  background: linear-gradient(135deg, #FF6E14 0%, #FF8C3A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Smooth animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out;
+}

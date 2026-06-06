@@ -1,0 +1,89 @@
+import { NextResponse } from 'next/server'
+import { db } from '@/lib/db'
+import { hashPassword, signToken } from '@/lib/auth'
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    const { name, phone, password } = body
+
+    if (!name || !phone || !password) {
+      return NextResponse.json(
+        { error: 'Nom, téléphone et mot de passe requis' },
+        { status: 400 }
+      )
+    }
+
+    // Validate Senegal phone
+    const phoneClean = phone.replace(/\s/g, '')
+    if (!/^7[0-8]\d{7}$/.test(phoneClean)) {
+      return NextResponse.json(
+        { error: 'Numéro de téléphone invalide (format: 7X XXX XX XX)' },
+        { status: 400 }
+      )
+    }
+
+    if (password.length < 4) {
+      return NextResponse.json(
+        { error: 'Le mot de passe doit contenir au moins 4 caractères' },
+        { status: 400 }
+      )
+    }
+
+    // Check if phone already exists
+    const existing = await db.user.findUnique({ where: { phone: phoneClean } })
+    if (existing) {
+      return NextResponse.json(
+        { error: 'Ce numéro de téléphone est déjà utilisé' },
+        { status: 400 }
+      )
+    }
+
+    const hashedPassword = hashPassword(password)
+
+    const user = await db.user.create({
+      data: {
+        name,
+        phone: phoneClean,
+        password: hashedPassword,
+        role: 'user',
+        points: 0,
+      },
+    })
+
+    const token = signToken({
+      userId: user.id,
+      phone: user.phone,
+      role: user.role,
+      name: user.name,
+      subscriptionTier: user.subscriptionTier,
+    })
+
+    const response = NextResponse.json({
+      user: {
+        userId: user.id,
+        phone: user.phone,
+        role: user.role,
+        name: user.name,
+        subscriptionTier: user.subscriptionTier,
+        points: user.points,
+      },
+    })
+
+    response.cookies.set('wakhma_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/',
+    })
+
+    return response
+  } catch (error) {
+    console.error('Register error:', error)
+    return NextResponse.json(
+      { error: 'Erreur lors de l\'inscription' },
+      { status: 500 }
+    )
+  }
+}

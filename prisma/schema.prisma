@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id               String    @id @default(cuid())
+  name             String
+  phone            String    @unique
+  password         String?
+  role             String    @default("user")
+  points           Int       @default(0)
+  subscriptionTier String?
+  subscriptionStart String?
+  subscriptionEnd   String?
+  createdAt        DateTime  @default(now())
+  demands          Demand[]
+  reveals          Reveal[]
+}
+
+model Demand {
+  id          String    @id @default(cuid())
+  title       String
+  description String
+  category    String    @default("Autre")
+  budget      Int       @default(0)
+  quartier    String    @default("Dakar")
+  urgency     String    @default("flexible")
+  photo       String?
+  whatsapp    String
+  status      String    @default("active")
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  createdAt   DateTime  @default(now())
+  reveals     Reveal[]
+}
+
+model Reveal {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  demandId  String
+  demand    Demand   @relation(fields: [demandId], references: [id])
+  createdAt DateTime @default(now())
+}

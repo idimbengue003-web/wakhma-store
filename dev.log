@@ -1,0 +1,16 @@
+$ next dev
+▲ Next.js 16.2.7 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://21.0.11.8:3000
+✓ Ready in 241ms
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /home/z/my-project/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /home/z/my-project/wakhma-store/bun.lock
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+
+ GET / 200 in 346ms (next.js: 108ms, proxy.ts: 60ms, application-code: 178ms)
+ GET /api/demands 200 in 472ms (next.js: 442ms, proxy.ts: 5ms, application-code: 24ms)
