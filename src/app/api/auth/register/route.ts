@@ -5,7 +5,7 @@ import { hashPassword, signToken } from '@/lib/auth'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, phone, password } = body
+    const { name, phone, password, userType } = body
 
     if (!name || !phone || !password) {
       return NextResponse.json(
@@ -13,6 +13,9 @@ export async function POST(request: Request) {
         { status: 400 }
       )
     }
+
+    // Validate userType
+    const validType = userType === 'vendeur' ? 'vendeur' : 'acheteur'
 
     // Validate Senegal phone
     const phoneClean = phone.replace(/\s/g, '')
@@ -47,6 +50,7 @@ export async function POST(request: Request) {
         phone: phoneClean,
         password: hashedPassword,
         role: 'user',
+        userType: validType,
         points: 0,
       },
     })
@@ -67,6 +71,7 @@ export async function POST(request: Request) {
         name: user.name,
         subscriptionTier: user.subscriptionTier,
         points: user.points,
+        userType: user.userType,
       },
     })
 
@@ -74,7 +79,7 @@ export async function POST(request: Request) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
       path: '/',
     })
 

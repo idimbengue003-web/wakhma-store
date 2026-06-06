@@ -13,6 +13,7 @@ model User {
   phone            String    @unique
   password         String?
   role             String    @default("user")
+  userType         String    @default("acheteur")  // acheteur ou vendeur
   points           Int       @default(0)
   subscriptionTier String?
   subscriptionStart String?
@@ -28,11 +29,13 @@ model Demand {
   description String
   category    String    @default("Autre")
   budget      Int       @default(0)
+  price       Int       @default(0)       // prix de vente pour les vendeurs
   quartier    String    @default("Dakar")
   urgency     String    @default("flexible")
   photo       String?
   whatsapp    String
   status      String    @default("active")
+  annonceType String    @default("cherche")  // cherche ou vends
   userId      String
   user        User      @relation(fields: [userId], references: [id])
   createdAt   DateTime  @default(now())

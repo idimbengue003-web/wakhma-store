@@ -5,6 +5,12 @@ export const REVEAL_PRICES: Record<string, number> = {
   admin: 0,
 }
 
+export const VENDOR_ANNONCE_LIMITS: Record<string, number> = {
+  none: 0,       // vendeur simple = 0 annonces
+  diambar: 3,    // Diambar = 3 annonces
+  king: 3,       // KING VIP = 3 annonces
+}
+
 export const SUBSCRIPTION_TIERS = [
   {
     id: 'diambar',
@@ -18,6 +24,7 @@ export const SUBSCRIPTION_TIERS = [
       'Révélation à 1 000 pts',
       '30 000 points offerts',
       'Badge 💎 Diambar',
+      '3 annonces "Je vends" actives',
       'Annonces visibles en priorité',
     ],
   },
@@ -33,6 +40,7 @@ export const SUBSCRIPTION_TIERS = [
       'Révélation à 500 pts (meilleur prix !)',
       '75 000 points offerts',
       'Badge ⭐ KING VIP',
+      '3 annonces "Je vends" actives',
       'Nom en étoile dans les messages WhatsApp',
     ],
   },

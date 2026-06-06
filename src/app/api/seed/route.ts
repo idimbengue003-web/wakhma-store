@@ -11,6 +11,7 @@ async function ensureTables() {
       "phone" TEXT NOT NULL UNIQUE,
       "password" TEXT,
       "role" TEXT NOT NULL DEFAULT 'user',
+      "userType" TEXT NOT NULL DEFAULT 'acheteur',
       "points" INTEGER NOT NULL DEFAULT 0,
       "subscriptionTier" TEXT,
       "subscriptionStart" TEXT,
@@ -26,11 +27,13 @@ async function ensureTables() {
       "description" TEXT NOT NULL,
       "category" TEXT NOT NULL DEFAULT 'Autre',
       "budget" INTEGER NOT NULL DEFAULT 0,
+      "price" INTEGER NOT NULL DEFAULT 0,
       "quartier" TEXT NOT NULL DEFAULT 'Dakar',
       "urgency" TEXT NOT NULL DEFAULT 'flexible',
       "photo" TEXT,
       "whatsapp" TEXT NOT NULL,
       "status" TEXT NOT NULL DEFAULT 'active',
+      "annonceType" TEXT NOT NULL DEFAULT 'cherche',
       "userId" TEXT NOT NULL,
       "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
@@ -84,6 +87,11 @@ async function ensureTables() {
       END IF;
     END $$;
   `)
+
+  // Add missing columns if tables already exist
+  try { await db.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "userType" TEXT NOT NULL DEFAULT 'acheteur';`); } catch { /* already exists */ }
+  try { await db.$executeRawUnsafe(`ALTER TABLE "Demand" ADD COLUMN IF NOT EXISTS "price" INTEGER NOT NULL DEFAULT 0;`); } catch { /* already exists */ }
+  try { await db.$executeRawUnsafe(`ALTER TABLE "Demand" ADD COLUMN IF NOT EXISTS "annonceType" TEXT NOT NULL DEFAULT 'cherche';`); } catch { /* already exists */ }
 
   // Create indexes if they don't exist
   await db.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "Demand_userId_idx" ON "Demand"("userId");`)

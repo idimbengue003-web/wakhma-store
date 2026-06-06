@@ -12,6 +12,7 @@ interface Demand {
   description: string
   category: string
   budget: number
+  price: number
   quartier: string
   urgency: string
   photo?: string | null
@@ -20,6 +21,8 @@ interface Demand {
   createdAt: string
   userName: string
   userSubscriptionTier?: string | null
+  userType?: string
+  annonceType?: string
   hasPhoneInText: boolean
 }
 

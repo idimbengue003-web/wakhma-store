@@ -8,6 +8,7 @@ interface User {
   name: string
   points: number
   subscriptionTier?: string | null
+  userType?: string
 }
 
 interface AuthState {
