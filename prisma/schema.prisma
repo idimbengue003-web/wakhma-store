@@ -38,7 +38,7 @@ model Demand {
   whatsapp    String
   status      String    @default("active") // active, expired, sold
   annonceType String    @default("cherche")  // cherche ou vends
-  expiresAt   DateTime  // date d'expiration (7 jours après création)
+  expiresAt   DateTime?  // date d'expiration (7 jours après création)
   userId      String
   user        User      @relation(fields: [userId], references: [id])
   createdAt   DateTime  @default(now())

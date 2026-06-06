@@ -90,8 +90,10 @@ export async function POST(request: Request) {
     return response
   } catch (error) {
     console.error('Register error:', error)
+    const msg = error instanceof Error ? error.message : String(error)
+    // Return more specific error for debugging (remove in production if needed)
     return NextResponse.json(
-      { error: 'Erreur lors de l\'inscription' },
+      { error: 'Erreur lors de l\'inscription', detail: msg },
       { status: 500 }
     )
   }
