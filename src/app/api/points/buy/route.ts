@@ -3,7 +3,15 @@ import { db } from '@/lib/db'
 import { getSession } from '@/lib/auth'
 import { POINTS_TIERS } from '@/lib/constants'
 
+// DEPRECATED: This route is only for development/testing.
+// In production, points are purchased through SenePay payment.
+// This route is disabled in production to prevent free points exploitation.
 export async function POST(request: Request) {
+  // Block in production
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Cette route est désactivée en production. Utilisez le paiement SenePay.' }, { status: 403 })
+  }
+
   try {
     const session = await getSession()
     if (!session) {
@@ -19,7 +27,6 @@ export async function POST(request: Request) {
 
     const tier = POINTS_TIERS[tierIndex]
 
-    // Demo mode: instantly add points
     const user = await db.user.update({
       where: { id: session.userId },
       data: { points: { increment: tier.points } },

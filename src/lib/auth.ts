@@ -2,7 +2,11 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import { cookies } from 'next/headers'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'wakhma-store-secret-2024'
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? '' : 'wakhma-dev-secret-2024')
+
+if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
+  console.error('[FATAL] JWT_SECRET environment variable is required in production!')
+}
 
 export interface JWTPayload {
   userId: string

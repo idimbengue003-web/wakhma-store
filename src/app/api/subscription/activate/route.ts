@@ -3,7 +3,15 @@ import { db } from '@/lib/db'
 import { getSession } from '@/lib/auth'
 import { SUBSCRIPTION_TIERS } from '@/lib/constants'
 
+// DEPRECATED: This route is only for development/testing.
+// In production, subscriptions are activated through SenePay payment.
+// This route is disabled in production to prevent free subscription exploitation.
 export async function POST(request: Request) {
+  // Block in production
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Cette route est désactivée en production. Utilisez le paiement SenePay.' }, { status: 403 })
+  }
+
   try {
     const session = await getSession()
     if (!session) {
@@ -18,19 +26,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Abonnement invalide' }, { status: 400 })
     }
 
-    // Calculate subscription dates
     const now = new Date()
     const endDate = new Date()
     endDate.setDate(endDate.getDate() + tier.durationDays)
 
-    // Demo mode: instantly activate
     const user = await db.user.update({
       where: { id: session.userId },
       data: {
         subscriptionTier: tier.id,
         subscriptionStart: now.toISOString(),
         subscriptionEnd: endDate.toISOString(),
-        role: tier.id === 'king' ? 'pro' : (session.role === 'admin' ? 'admin' : 'pro'),
         points: { increment: tier.bonusPoints },
       },
     })

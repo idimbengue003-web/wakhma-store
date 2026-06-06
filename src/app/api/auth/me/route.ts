@@ -32,6 +32,25 @@ export async function GET() {
       return NextResponse.json({ error: 'Utilisateur introuvable' }, { status: 404 })
     }
 
+    // Check if subscription has expired — auto-downgrade
+    if (user.subscriptionTier && user.subscriptionEnd) {
+      const endDate = new Date(user.subscriptionEnd)
+      if (endDate < new Date()) {
+        // Subscription expired — remove tier
+        await db.user.update({
+          where: { id: user.id },
+          data: {
+            subscriptionTier: null,
+            subscriptionStart: null,
+            subscriptionEnd: null,
+          },
+        })
+        user.subscriptionTier = null
+        user.subscriptionStart = null
+        user.subscriptionEnd = null
+      }
+    }
+
     return NextResponse.json({
       user: {
         userId: user.id,

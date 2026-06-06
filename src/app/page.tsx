@@ -216,7 +216,7 @@ export default function HomePage() {
       <section className="bg-white py-8 sm:py-10">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">
-            Tu cherche un objet introuvable ou budget limité ?
+            Tu cherches un objet introuvable ou budget limité ?
           </h2>
           <p className="text-gray-600 mb-5 text-sm">
             Dépose ton annonce gratuitement et des acheteurs te contacteront directement sur WhatsApp.
