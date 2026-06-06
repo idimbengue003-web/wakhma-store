@@ -33,12 +33,12 @@ export default function CGU() {
 
         <section>
           <h2 className="text-lg font-bold text-gray-900">4. Système de points et abonnements</h2>
-          <p>WakhmaStore propose un système de points permettant de révéler les numéros WhatsApp des vendeurs. Les points sont achetés via SenePay (Wave, Orange Money, Free Money). Les abonnements Diambar et VIP KING donnent accès à des avantages pendant une durée de 30 jours. À l&apos;expiration, l&apos;abonnement est résilié automatiquement sans renouvellement.</p>
+          <p>WakhmaStore propose un système de points permettant de révéler les numéros WhatsApp des vendeurs. Les points sont achetés via Wave et validés par notre équipe via WhatsApp. Les abonnements Diambar et VIP KING donnent accès à des avantages pendant une durée de 30 jours. À l&apos;expiration, l&apos;abonnement est résilié automatiquement sans renouvellement.</p>
         </section>
 
         <section>
           <h2 className="text-lg font-bold text-gray-900">5. Paiements et remboursements</h2>
-          <p>Les paiements sont traités par SenePay. Les achats de points et abonnements sont définitifs et ne donnent pas lieu à remboursement, sauf en cas de dysfonctionnement technique prouvé. En cas de problème, contactez-nous à contact@wakhmastore.com.</p>
+          <p>Les paiements sont effectués via Wave et validés par notre équipe. Les achats de points et abonnements sont définitifs et ne donnent pas lieu à remboursement, sauf en cas de dysfonctionnement technique prouvé. En cas de problème, contactez-nous à contact@wakhmastore.com.</p>
         </section>
 
         <section>

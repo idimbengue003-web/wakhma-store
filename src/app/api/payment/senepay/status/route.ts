@@ -2,8 +2,12 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { autoMigrate } from '@/lib/migrate'
 
-// Check payment status by orderReference
-// Used by the payment-success page to verify payment and get details
+// ─── ROUTE MODIFIÉE ───
+// Ne consulte plus SenePay pour confirmer les paiements automatiquement.
+// Le mode test SenePay validait les paiements sans vrai transfert d'argent.
+// Maintenant, seul l'admin peut valider un paiement via /api/admin/payments.
+// Cette route retourne juste le statut enregistré en base de données.
+
 export async function GET(request: Request) {
   try {
     await autoMigrate()
@@ -24,12 +28,12 @@ export async function GET(request: Request) {
         amount: true,
         tierIndex: true,
         tierId: true,
+        provider: true,
         providerTxId: true,
         sessionToken: true,
-        netAmount: true,
-        fees: true,
         createdAt: true,
         completedAt: true,
+        adminNote: true,
         userId: true,
       },
     })
@@ -38,52 +42,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Paiement non trouvé' }, { status: 404 })
     }
 
-    // If payment is still pending, check with SenePay API
-    if (payment.status === 'pending' && payment.sessionToken) {
-      const senepayApiKey = process.env.SENEPAY_API_KEY
-      const senepayApiSecret = process.env.SENEPAY_API_SECRET
-
-      if (senepayApiKey && senepayApiSecret) {
-        try {
-          const statusResponse = await fetch(
-            `https://api.sene-pay.com/api/v1/checkout/sessions/${payment.sessionToken}`,
-            {
-              headers: {
-                'X-Api-Key': senepayApiKey,
-                'X-Api-Secret': senepayApiSecret,
-              },
-            }
-          )
-
-          if (statusResponse.ok) {
-            const statusData = await statusResponse.json()
-
-            if (statusData.status === 'Complete') {
-              // Trigger the webhook processing logic by calling it internally
-              // The webhook should have already handled this, but as a fallback
-              console.log(`[SenePay] Status check: payment ${orderRef} is Complete on SenePay side`)
-              return NextResponse.json({
-                ...payment,
-                status: 'completed',
-                providerNote: 'Paiement confirmé côté SenePay - crédit en cours',
-              })
-            } else if (statusData.status === 'Failed' || statusData.status === 'Cancelled' || statusData.status === 'Expired') {
-              await db.payment.update({
-                where: { orderReference: orderRef },
-                data: { status: statusData.status.toLowerCase() },
-              })
-              return NextResponse.json({ ...payment, status: statusData.status.toLowerCase() })
-            }
-          }
-        } catch (err) {
-          console.error('[SenePay] Status check failed:', err)
-        }
-      }
-    }
-
+    // IMPORTANT: On ne consulte plus SenePay.
+    // Le statut retourné est uniquement celui en base de données,
+    // qui ne passe à "completed" QUE quand l'admin valide.
     return NextResponse.json(payment)
   } catch (error) {
-    console.error('[SenePay] Status check error:', error)
+    console.error('[Payment Status] Error:', error)
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

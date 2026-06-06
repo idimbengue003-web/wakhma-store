@@ -56,22 +56,30 @@ model Reveal {
 }
 
 model Payment {
-  id             String   @id @default(cuid())
-  userId         String
-  user           User     @relation(fields: [userId], references: [id])
-  type           String   // "points" ou "subscription"
-  amount         Int      // montant en FCFA
-  currency       String   @default("XOF")
-  status         String   @default("pending") // pending, completed, failed, expired
-  sessionToken   String?  // token SenePay checkout session
-  orderReference String?  @unique // référence unique de commande
-  tierIndex      Int?     // index du pack points
-  tierId         String?  // id de l'abonnement (diambar/king)
-  provider       String   @default("senepay")
-  providerTxId   String?  // ID transaction SenePay (SENEPAY_PAYIN_...)
-  netAmount      Int?     // montant net reçu après frais
-  fees           Int?     // frais prélevés
-  metadata       String?  // JSON libre
-  createdAt      DateTime @default(now())
-  completedAt    DateTime?
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  type            String    // "points" ou "subscription"
+  amount          Int       // montant en FCFA
+  currency        String    @default("XOF")
+  status          String    @default("pending") // pending, completed, failed, expired
+  sessionToken    String?   // token SenePay checkout session
+  orderReference  String?   @unique // référence unique de commande
+  tierIndex       Int?      // index du pack points
+  tierId          String?   // id de l'abonnement (diambar/king)
+  provider        String    @default("senepay") // senepay, whatsapp
+  providerTxId    String?   // ID transaction SenePay ou ID Wave
+  netAmount       Int?      // montant net reçu après frais
+  fees            Int?      // frais prélevés
+  metadata        String?   // JSON libre
+
+  // Champs WhatsApp Webhook Form
+  senderPhone     String?   // numéro Wave de l'expéditeur
+  senderName      String?   // nom de l'expéditeur
+  transactionId   String?   // ID de transaction Wave (envoyé par l'utilisateur)
+  proofImageUrl   String?   // URL ou base64 du screenshot de preuve
+  adminNote       String?   // note de l'admin lors de la validation/refus
+
+  createdAt       DateTime  @default(now())
+  completedAt     DateTime?
 }

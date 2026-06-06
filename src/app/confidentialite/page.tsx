@@ -18,7 +18,7 @@ export default function Confidentialite() {
       <div className="prose prose-gray max-w-none space-y-6 text-sm text-gray-700">
         <section>
           <h2 className="text-lg font-bold text-gray-900">1. Données collectées</h2>
-          <p>WakhmaStore collecte les données suivantes lors de votre inscription et utilisation du site : nom, numéro de téléphone, mot de passe (chiffré). Lors de la publication d&apos;annonces, les données saisies (titre, description, photos, numéro WhatsApp, localisation) sont enregistrées. Les données de paiement sont traitées par SenePay et ne sont pas stockées sur nos serveurs.</p>
+          <p>WakhmaStore collecte les données suivantes lors de votre inscription et utilisation du site : nom, numéro de téléphone, mot de passe (chiffré). Lors de la publication d&apos;annonces, les données saisies (titre, description, photos, numéro WhatsApp, localisation) sont enregistrées. Les données de paiement sont traitées de manière sécurisée et ne sont pas partagées avec des tiers.</p>
         </section>
 
         <section>
@@ -33,7 +33,7 @@ export default function Confidentialite() {
 
         <section>
           <h2 className="text-lg font-bold text-gray-900">4. Sécurité des données</h2>
-          <p>Les mots de passe sont chiffrés de manière irréversible (bcrypt). Les communications sont sécurisées par HTTPS. Les sessions sont gérées par des tokens JWT sécurisés. Les paiements sont traités par SenePay avec un chiffrement de niveau bancaire.</p>
+          <p>Les mots de passe sont chiffrés de manière irréversible (bcrypt). Les communications sont sécurisées par HTTPS. Les sessions sont gérées par des tokens JWT sécurisés. Les paiements sont effectués via Wave et validés manuellement par notre équipe.</p>
         </section>
 
         <section>

@@ -39,7 +39,7 @@ export default function MentionsLegales() {
 
         <section>
           <h2 className="text-lg font-bold text-gray-900">5. Paiements</h2>
-          <p>Les paiements sur WakhmaStore sont traités par SenePay, plateforme de paiement certifiée. Les transactions sont sécurisées et conformes aux normes en vigueur. WakhmaStore ne conserve aucune donnée bancaire.</p>
+          <p>Les paiements sur WakhmaStore sont effectués via Wave et validés par notre équipe. Les transactions sont sécurisées et vérifiées manuellement pour garantir la sécurité de chaque utilisateur. WakhmaStore ne conserve aucune donnée bancaire.</p>
         </section>
 
         <section>

@@ -69,6 +69,18 @@ export async function autoMigrate() {
       `)
     } catch { /* table exists */ }
 
+    // ─── Payment table: WhatsApp Webhook Form columns ───
+    const paymentColumns = [
+      `ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "senderPhone" TEXT`,
+      `ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "senderName" TEXT`,
+      `ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "transactionId" TEXT`,
+      `ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "proofImageUrl" TEXT`,
+      `ALTER TABLE "Payment" ADD COLUMN IF NOT EXISTS "adminNote" TEXT`,
+    ]
+    for (const sql of paymentColumns) {
+      try { await db.$executeRawUnsafe(sql) } catch { /* column exists */ }
+    }
+
     // ─── Create indexes if they don't exist ───
     const indexes = [
       `CREATE INDEX IF NOT EXISTS "Demand_userId_idx" ON "Demand"("userId")`,

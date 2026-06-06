@@ -7,9 +7,27 @@ import { CATEGORY_EMOJIS, formatFCFA, timeAgo, VENDOR_ANNONCE_LIMITS } from '@/l
 import {
   User, Zap, Package, ShoppingCart, TrendingUp, RefreshCw,
   Trash2, CheckCircle, AlertTriangle, ArrowLeft, Store, Search,
-  Clock, Eye, MapPin, Star, Crown, LogOut, ChevronRight
+  Clock, Eye, MapPin, Star, Crown, LogOut, ChevronRight,
+  CreditCard, MessageCircle
 } from 'lucide-react'
 import Link from 'next/link'
+
+interface PaymentRecord {
+  id: string
+  type: string
+  amount: number
+  currency: string
+  status: string
+  orderReference: string | null
+  tierIndex: number | null
+  tierId: string | null
+  provider: string
+  senderPhone: string | null
+  transactionId: string | null
+  createdAt: string
+  completedAt: string | null
+  adminNote: string | null
+}
 
 interface MyDemand {
   id: string
@@ -39,6 +57,7 @@ export default function ProfilPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
+  const [paymentHistory, setPaymentHistory] = useState<PaymentRecord[]>([])
 
   const loadDemands = useCallback(async () => {
     try {
@@ -51,13 +70,24 @@ export default function ProfilPage() {
     finally { setLoading(false) }
   }, [user?.userId])
 
+  const loadPaymentHistory = useCallback(async () => {
+    try {
+      const res = await fetch('/api/payment/history')
+      if (res.ok) {
+        const data = await res.json()
+        setPaymentHistory(data.payments)
+      }
+    } catch { /* silent */ }
+  }, [])
+
   useEffect(() => {
     if (!user) {
       router.push('/login')
       return
     }
     loadDemands()
-  }, [user, router, loadDemands])
+    loadPaymentHistory()
+  }, [user, router, loadDemands, loadPaymentHistory])
 
   const handleRenew = async (demandId: string) => {
     setActionLoading(demandId)
@@ -396,6 +426,67 @@ export default function ProfilPage() {
                 </div>
               )
             })}
+          </div>
+        )}
+      </div>
+
+      {/* ─── PAYMENT HISTORY ─── */}
+      <div className="mb-6">
+        <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+          <CreditCard className="w-5 h-5 text-blue-800" />
+          Historique des paiements ({paymentHistory.length})
+        </h2>
+
+        {paymentHistory.length === 0 ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-6 text-center">
+            <CreditCard className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+            <p className="text-sm text-gray-500">Aucun paiement effectué</p>
+            <Link href="/recharge" className="inline-flex items-center gap-1 mt-3 px-4 py-2 bg-orange text-white rounded-lg font-bold text-xs">
+              Recharger des points
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {paymentHistory.map((p) => (
+              <div key={p.id} className="bg-white rounded-xl border border-gray-200 p-3 flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                      p.provider === 'whatsapp' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                    }`}>
+                      {p.provider === 'whatsapp' ? (
+                        <span className="flex items-center gap-0.5"><MessageCircle className="w-2.5 h-2.5" /> WhatsApp</span>
+                      ) : 'En ligne'}
+                    </span>
+                    <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${
+                      p.status === 'completed' ? 'bg-green-50 text-green-600' :
+                      p.status === 'pending' ? 'bg-amber-50 text-amber-600' :
+                      'bg-red-50 text-red-600'
+                    }`}>
+                      {p.status === 'completed' ? '✅ Validé' : p.status === 'pending' ? '⏳ En attente' : '❌ Refusé'}
+                    </span>
+                    <span className="text-xs font-medium text-gray-700">
+                      {p.type === 'points' ? '💎 Points' : '⭐ Abonnement'}
+                    </span>
+                  </div>
+                  <p className="text-sm font-bold text-gray-900">{formatFCFA(p.amount)}</p>
+                  <p className="text-[11px] text-gray-400">{new Date(p.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                  {p.adminNote && p.status !== 'completed' && (
+                    <p className="text-[11px] text-gray-500 italic mt-0.5">{p.adminNote}</p>
+                  )}
+                </div>
+                <div className="text-right shrink-0 ml-3">
+                  {p.status === 'pending' && (
+                    <Link
+                      href="/recharge"
+                      className="text-[10px] text-amber-600 font-medium hover:underline"
+                    >
+                      Voir statut →
+                    </Link>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
