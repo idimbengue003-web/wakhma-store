@@ -2,149 +2,109 @@
 
 import Link from 'next/link'
 import { useAuthStore } from '@/lib/store'
-import { Menu, X, Store, LogOut, User, Search } from 'lucide-react'
-import { useState } from 'react'
+import { Menu, X, Store, LogOut, User } from 'lucide-react'
+import { useState, useCallback } from 'react'
 
 export function Navbar() {
   const { user } = useAuthStore()
   const [mobileOpen, setMobileOpen] = useState(false)
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await fetch('/api/auth/logout', { method: 'POST' })
     window.location.href = '/'
-  }
+  }, [])
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+    <nav className="sticky top-0 z-50 bg-white border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 font-extrabold text-xl shrink-0">
-            <div className="w-9 h-9 bg-orange rounded-xl flex items-center justify-center">
-              <Store className="w-5 h-5 text-white" />
+        <div className="flex justify-between items-center h-14">
+          <Link href="/" className="flex items-center gap-2 font-extrabold text-lg shrink-0">
+            <div className="w-8 h-8 bg-orange rounded-lg flex items-center justify-center">
+              <Store className="w-4 h-4 text-white" />
             </div>
             <span className="text-orange">Wakhma Store</span>
           </Link>
 
-          {/* Center: Categories link (desktop) */}
-          <div className="hidden md:flex items-center gap-6 ml-8">
-            <NavLink href="/annonces">Catégories</NavLink>
+          <div className="hidden md:flex items-center gap-5 ml-6">
+            <Link href="/annonces" className="text-sm font-medium text-gray-700 hover:text-orange">
+              Catégories
+            </Link>
           </div>
 
-          {/* Right: CTA + Auth */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2">
             <Link
               href="/deposer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange hover:bg-orange-dark text-white rounded-xl font-bold text-sm transition-colors shadow-sm"
+              className="px-4 py-2 bg-orange hover:bg-orange-dark text-white rounded-lg font-bold text-sm"
             >
               Déposer une annonce
             </Link>
             {user ? (
               <div className="relative group">
-                <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-xl transition-colors">
-                  <div className="w-8 h-8 bg-orange-bg rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-orange" />
+                <button className="flex items-center gap-1.5 px-2 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+                  <div className="w-7 h-7 bg-orange-bg rounded-full flex items-center justify-center">
+                    <User className="w-3.5 h-3.5 text-orange" />
                   </div>
-                  <span className="hidden lg:inline max-w-[100px] truncate">{user.name}</span>
+                  <span className="hidden lg:inline max-w-[80px] truncate text-xs">{user.name}</span>
                   {user.subscriptionTier === 'king' && <span className="text-xs">⭐</span>}
                   {user.subscriptionTier === 'diambar' && <span className="text-xs">💎</span>}
                 </button>
-                {/* Dropdown */}
-                <div className="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
-                    <p className="text-xs text-gray-500 capitalize">{user.role}</p>
+                <div className="absolute right-0 mt-1 w-44 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible">
+                  <div className="px-3 py-2 border-b border-gray-100">
+                    <p className="text-xs font-medium text-gray-900 truncate">{user.name}</p>
+                    <p className="text-[10px] text-gray-500 capitalize">{user.role}</p>
                   </div>
-                  <Link href="/annonces" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Mes annonces</Link>
-                  <Link href="/recharge" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Recharger</Link>
+                  <Link href="/annonces" className="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50">Mes annonces</Link>
+                  <Link href="/recharge" className="block px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50">Recharger</Link>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                    className="w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 flex items-center gap-1.5"
                   >
-                    <LogOut className="w-4 h-4" />
-                    Déconnexion
+                    <LogOut className="w-3 h-3" /> Déconnexion
                   </button>
                 </div>
               </div>
             ) : (
               <Link
                 href="/login"
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-orange hover:text-orange-dark border border-orange/30 hover:border-orange/50 rounded-xl transition-colors"
+                className="px-3 py-2 text-sm font-semibold text-orange hover:text-orange-dark border border-orange/30 hover:border-orange/50 rounded-lg"
               >
                 Se connecter
               </Link>
             )}
           </div>
 
-          {/* Mobile hamburger */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="md:hidden p-1.5 rounded-lg hover:bg-gray-100"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
-            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-gray-200 bg-white animate-fade-in">
-          <div className="px-4 py-3 space-y-1">
-            <MobileLink href="/annonces" onClick={() => setMobileOpen(false)}>
-              <Search className="w-4 h-4 inline mr-2" />
+        <div className="md:hidden border-t border-gray-100 bg-white animate-fade-in">
+          <div className="px-4 py-2 space-y-0.5">
+            <Link href="/annonces" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm text-gray-700 hover:text-orange hover:bg-orange-bg rounded-lg">
               Catégories
-            </MobileLink>
-            <MobileLink href="/deposer" onClick={() => setMobileOpen(false)}>
+            </Link>
+            <Link href="/deposer" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm text-gray-700 hover:text-orange hover:bg-orange-bg rounded-lg">
               Déposer une annonce
-            </MobileLink>
+            </Link>
             {user ? (
               <>
-                <MobileLink href="/annonces" onClick={() => setMobileOpen(false)}>Mes annonces</MobileLink>
-                <MobileLink href="/recharge" onClick={() => setMobileOpen(false)}>Recharger</MobileLink>
-                <MobileButton onClick={() => { handleLogout(); setMobileOpen(false) }}>
+                <Link href="/annonces" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">Mes annonces</Link>
+                <Link href="/recharge" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">Recharger</Link>
+                <button onClick={() => { handleLogout(); setMobileOpen(false) }} className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50">
                   Déconnexion
-                </MobileButton>
+                </button>
               </>
             ) : (
-              <MobileLink href="/login" onClick={() => setMobileOpen(false)}>Se connecter</MobileLink>
+              <Link href="/login" onClick={() => setMobileOpen(false)} className="block px-3 py-2 text-sm font-semibold text-orange">Se connecter</Link>
             )}
           </div>
         </div>
       )}
     </nav>
-  )
-}
-
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-orange hover:bg-orange-bg rounded-lg transition-colors"
-    >
-      {children}
-    </Link>
-  )
-}
-
-function MobileLink({ href, onClick, children }: { href: string; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      onClick={onClick}
-      className="block px-3 py-2.5 text-sm font-medium text-gray-700 hover:text-orange hover:bg-orange-bg rounded-lg transition-colors"
-    >
-      {children}
-    </Link>
-  )
-}
-
-function MobileButton({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      onClick={onClick}
-      className="w-full text-left px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-    >
-      {children}
-    </button>
   )
 }

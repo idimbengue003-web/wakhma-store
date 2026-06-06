@@ -8,6 +8,7 @@ import { Footer } from "@/components/Footer"
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
 })
 
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="fr" className={`${inter.variable} h-full antialiased`}>
+    <html lang="fr" className={`${inter.variable} h-full`}>
       <body className="min-h-screen flex flex-col bg-white text-gray-900">
         <AuthProvider>
           <Navbar />

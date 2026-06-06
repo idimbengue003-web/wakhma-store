@@ -3,7 +3,6 @@
 :root {
   --background: #ffffff;
   --foreground: #1a1a1a;
-  /* Wakhma original blue/green theme */
   --orange: #00E676;
   --orange-light: #69F0AE;
   --orange-dark: #00C853;
@@ -23,63 +22,39 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Search bar shadow */
+/* Lightweight search shadow - no transitions */
 .search-bar-shadow {
-  box-shadow: 0 4px 24px rgba(0, 230, 118, 0.18), 0 1.5px 6px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 12px rgba(0, 230, 118, 0.15);
 }
 
-.search-bar-shadow:focus-within {
-  box-shadow: 0 6px 32px rgba(0, 230, 118, 0.28), 0 2px 8px rgba(0,0,0,0.08);
-}
-
-/* Card hover */
+/* Card hover - GPU optimized, minimal */
 .annonce-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  will-change: transform;
+  transition: transform 0.15s ease;
 }
 .annonce-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0, 230, 118, 0.10);
+  transform: translateY(-2px);
 }
 
-/* Price shimmer */
+/* Price - simple color, no gradient text (faster) */
 .price-orange {
-  background: linear-gradient(135deg, #00E676 0%, #69F0AE 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #00E676;
 }
 
-/* Custom scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 3px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
+/* Minimal scrollbar */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
 
-/* Smooth animations */
+/* Simple fade only - no translateY */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 .animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.animate-slide-up {
-  animation: slideUp 0.4s ease-out;
+  animation: fadeIn 0.2s ease-out;
 }
