@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuthStore } from '@/lib/store'
 import { SUBSCRIPTION_TIERS, POINTS_TIERS, formatFCFA } from '@/lib/constants'
-import { CheckCircle, ArrowLeft, Zap, Crown, Star, X } from 'lucide-react'
+import { CheckCircle, ArrowLeft, Zap, Crown, Star, X, CreditCard } from 'lucide-react'
 import Link from 'next/link'
 import { Suspense } from 'react'
 
@@ -18,34 +18,36 @@ function RechargeContent() {
   const [success, setSuccess] = useState<string | null>(null)
   const [error, setError] = useState(searchParams.get('error') || '')
 
-  // Wave loading state per item
-  const [waveLoading, setWaveLoading] = useState<string | null>(null)
+  // Payment loading state per item
+  const [payLoading, setPayLoading] = useState<string | null>(null)
 
-  // ─── Wave payment flow ───
-  const handleWavePayment = async (type: 'points' | 'subscription', tierIndex: number, tierId: string) => {
+  // SenePay payment flow - creates a checkout session and redirects user
+  const handlePayment = async (type: 'points' | 'subscription', tierIndex: number, tierId: string) => {
     if (!user) {
       router.push('/login')
       return
     }
     const key = `${type}-${tierIndex}-${tierId}`
-    setWaveLoading(key)
+    setPayLoading(key)
     setError('')
     try {
-      const res = await fetch('/api/payment/wave/create', {
+      const res = await fetch('/api/payment/senepay/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type, tierIndex, tierId }),
       })
       const data = await res.json()
-      if (res.ok && data.redirectUrl) {
-        window.location.href = data.redirectUrl
+      if (res.ok && data.checkoutUrl) {
+        // Redirect user to SenePay hosted checkout page
+        // Supports Wave, Orange Money, Free Money, MTN, etc.
+        window.location.href = data.checkoutUrl
       } else {
-        setError(data.detail ? `${data.error} : ${data.detail}` : (data.error || 'Erreur lors du paiement Wave'))
-        setWaveLoading(null)
+        setError(data.error || 'Erreur lors de la création du paiement')
+        setPayLoading(null)
       }
     } catch {
       setError('Erreur de connexion au serveur')
-      setWaveLoading(null)
+      setPayLoading(null)
     }
   }
 
@@ -74,6 +76,14 @@ function RechargeContent() {
             )}
           </div>
         )}
+      </div>
+
+      {/* Payment methods info */}
+      <div className="mb-5 p-3 bg-orange-bg border border-orange/20 rounded-lg text-xs text-gray-700 flex items-center gap-2">
+        <CreditCard className="w-4 h-4 text-orange shrink-0" />
+        <span>
+          Paiement sécurisé via <strong>SenePay</strong> — Wave, Orange Money, Free Money et plus encore
+        </span>
       </div>
 
       {success && (
@@ -146,27 +156,21 @@ function RechargeContent() {
                     ))}
                   </ul>
 
-                  {/* Wave payment button */}
+                  {/* SenePay payment button */}
                   <button
-                    onClick={() => handleWavePayment('subscription', -1, tier.id)}
-                    disabled={waveLoading !== null}
-                    className={`w-full py-2.5 rounded-lg font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50 ${
-                      tier.id === 'king'
-                        ? 'bg-[#1DC7EA] hover:bg-[#1AB5D6] text-white'
-                        : 'bg-[#1DC7EA] hover:bg-[#1AB5D6] text-white'
-                    }`}
+                    onClick={() => handlePayment('subscription', -1, tier.id)}
+                    disabled={payLoading !== null}
+                    className="w-full py-2.5 rounded-lg font-bold text-sm flex items-center justify-center gap-2 bg-orange hover:bg-orange-dark text-white disabled:opacity-50"
                   >
-                    {waveLoading === loadingKey ? (
+                    {payLoading === loadingKey ? (
                       <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
                     ) : (
                       <>
-                        <svg viewBox="0 0 24 24" className="w-4 h-4" fill="currentColor">
-                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
-                        </svg>
+                        <CreditCard className="w-4 h-4" />
                         {tier.id === 'king' ? (
-                          <><Crown className="w-4 h-4" /> Payer avec Wave</>
+                          <><Crown className="w-4 h-4" /> Payer {formatFCFA(tier.price)}</>
                         ) : (
-                          <><Star className="w-4 h-4" /> Payer avec Wave</>
+                          <><Star className="w-4 h-4" /> Payer {formatFCFA(tier.price)}</>
                         )}
                       </>
                     )}
@@ -190,21 +194,19 @@ function RechargeContent() {
                   <span className="text-xl font-bold text-gray-900">{tier.points.toLocaleString('fr-FR')}</span>
                   <span className="text-xs text-gray-500"> pts</span>
                 </div>
-                <div className="text-sm text-[#1DC7EA] font-semibold mb-3">{formatFCFA(tier.prix)}</div>
+                <div className="text-sm text-orange font-semibold mb-3">{formatFCFA(tier.prix)}</div>
 
                 <button
-                  onClick={() => handleWavePayment('points', index, '')}
-                  disabled={waveLoading !== null}
-                  className="w-full py-2 bg-[#1DC7EA] hover:bg-[#1AB5D6] text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  onClick={() => handlePayment('points', index, '')}
+                  disabled={payLoading !== null}
+                  className="w-full py-2 bg-orange hover:bg-orange-dark text-white rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
-                  {waveLoading === loadingKey ? (
+                  {payLoading === loadingKey ? (
                     <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
                   ) : (
                     <>
-                      <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="currentColor">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
-                      </svg>
-                      Payer Wave
+                      <CreditCard className="w-3.5 h-3.5" />
+                      Payer {formatFCFA(tier.prix)}
                     </>
                   )}
                 </button>

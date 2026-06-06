@@ -44,6 +44,31 @@ export async function autoMigrate() {
       `)
     } catch { /* no expired demands */ }
 
+    // ─── Create Payment table if not exists ───
+    try {
+      await db.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "Payment" (
+          "id" TEXT NOT NULL PRIMARY KEY,
+          "userId" TEXT NOT NULL,
+          "type" TEXT NOT NULL,
+          "amount" INTEGER NOT NULL,
+          "currency" TEXT NOT NULL DEFAULT 'XOF',
+          "status" TEXT NOT NULL DEFAULT 'pending',
+          "sessionToken" TEXT,
+          "orderReference" TEXT UNIQUE,
+          "tierIndex" INTEGER,
+          "tierId" TEXT,
+          "provider" TEXT NOT NULL DEFAULT 'senepay',
+          "providerTxId" TEXT,
+          "netAmount" INTEGER,
+          "fees" INTEGER,
+          "metadata" TEXT,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "completedAt" TIMESTAMP(3)
+        )
+      `)
+    } catch { /* table exists */ }
+
     // ─── Create indexes if they don't exist ───
     const indexes = [
       `CREATE INDEX IF NOT EXISTS "Demand_userId_idx" ON "Demand"("userId")`,
@@ -51,6 +76,9 @@ export async function autoMigrate() {
       `CREATE INDEX IF NOT EXISTS "Demand_annonceType_idx" ON "Demand"("annonceType")`,
       `CREATE INDEX IF NOT EXISTS "Reveal_userId_idx" ON "Reveal"("userId")`,
       `CREATE INDEX IF NOT EXISTS "Reveal_demandId_idx" ON "Reveal"("demandId")`,
+      `CREATE INDEX IF NOT EXISTS "Payment_userId_idx" ON "Payment"("userId")`,
+      `CREATE INDEX IF NOT EXISTS "Payment_orderReference_idx" ON "Payment"("orderReference")`,
+      `CREATE INDEX IF NOT EXISTS "Payment_status_idx" ON "Payment"("status")`,
     ]
     for (const sql of indexes) {
       try { await db.$executeRawUnsafe(sql) } catch { /* index exists */ }
