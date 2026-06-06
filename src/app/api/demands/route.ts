@@ -2,12 +2,15 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { getSession } from '@/lib/auth'
 import { maskPhonesInText, containsPhoneInText, maskPhone, VENDOR_ANNONCE_LIMITS } from '@/lib/constants'
+import { autoMigrate } from '@/lib/migrate'
 import type { Demand, User, Reveal } from '@prisma/client'
 
 type DemandWithRelations = Demand & { user: User; reveals: Reveal[] }
 
 export async function GET(request: Request) {
   try {
+    await autoMigrate()
+
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
     const search = searchParams.get('search')
@@ -94,12 +97,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ demands: maskedDemands })
   } catch (error) {
     console.error('Demands GET error:', error)
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    const msg = error instanceof Error ? error.message : String(error)
+    return NextResponse.json({ error: 'Erreur serveur', detail: msg }, { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
   try {
+    await autoMigrate()
+
     const session = await getSession()
     if (!session) {
       return NextResponse.json({ error: 'Authentification requise' }, { status: 401 })
@@ -207,6 +213,7 @@ export async function POST(request: Request) {
         whatsapp: whatsapp.replace(/\s/g, ''),
         photo: photo || null,
         annonceType: isVente ? 'vends' : 'cherche',
+        status: 'active',
         expiresAt,
         userId: session.userId,
       },
@@ -215,6 +222,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ demand }, { status: 201 })
   } catch (error) {
     console.error('Demands POST error:', error)
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
+    const msg = error instanceof Error ? error.message : String(error)
+    return NextResponse.json({ error: 'Erreur serveur', detail: msg }, { status: 500 })
   }
 }

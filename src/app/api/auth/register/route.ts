@@ -1,30 +1,12 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { hashPassword, signToken } from '@/lib/auth'
-
-// Auto-migrate: ensure all required columns exist in the User table
-async function ensureUserColumns() {
-  const columns = [
-    { name: 'userType', sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "userType" TEXT NOT NULL DEFAULT 'acheteur'` },
-    { name: 'salesCount', sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "salesCount" INTEGER NOT NULL DEFAULT 0` },
-    { name: 'purchasesCount', sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "purchasesCount" INTEGER NOT NULL DEFAULT 0` },
-    { name: 'subscriptionTier', sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "subscriptionTier" TEXT` },
-    { name: 'subscriptionStart', sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "subscriptionStart" TEXT` },
-    { name: 'subscriptionEnd', sql: `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "subscriptionEnd" TEXT` },
-  ]
-  for (const col of columns) {
-    try {
-      await db.$executeRawUnsafe(col.sql)
-    } catch {
-      // Column already exists, ignore
-    }
-  }
-}
+import { autoMigrate } from '@/lib/migrate'
 
 export async function POST(request: Request) {
   try {
     // Auto-migrate first to ensure DB schema is in sync
-    await ensureUserColumns()
+    await autoMigrate()
 
     const body = await request.json()
     const { name, phone, password, userType } = body

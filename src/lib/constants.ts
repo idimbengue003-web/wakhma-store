@@ -84,7 +84,7 @@ export function formatFCFA(n: number): string {
   return new Intl.NumberFormat('fr-FR').format(n) + ' FCFA'
 }
 
-const PHONE_REGEX = /(\+221\s*)?7[0-8](\s?\d){7}/g
+const PHONE_REGEX = /(\+221\s*)?7[0-9](\s?\d){7}/g
 
 export function containsPhoneInText(text: string): boolean {
   if (!text) return false

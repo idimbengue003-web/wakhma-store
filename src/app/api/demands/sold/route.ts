@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { getSession } from '@/lib/auth'
+import { autoMigrate } from '@/lib/migrate'
 
 // Mark an annonce as sold (for "Je vends") or as bought (for "Je cherche")
 // Increments the user's salesCount or purchasesCount accordingly
 export async function POST(request: Request) {
   try {
+    await autoMigrate()
     const session = await getSession()
     if (!session) {
       return NextResponse.json({ error: 'Authentification requise' }, { status: 401 })

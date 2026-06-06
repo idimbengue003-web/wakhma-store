@@ -101,10 +101,10 @@ export default function DeposerPage() {
       if (res.ok) {
         setSuccess(true)
       } else {
-        setError(data.error || 'Erreur lors de la création')
+        setError(data.detail ? `${data.error} : ${data.detail}` : (data.error || 'Erreur lors de la création'))
       }
     } catch {
-      setError('Erreur de connexion')
+      setError('Erreur de connexion au serveur')
     } finally {
       setLoading(false)
     }

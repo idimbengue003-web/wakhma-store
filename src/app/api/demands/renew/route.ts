@@ -2,10 +2,12 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { getSession } from '@/lib/auth'
 import { VENDOR_ANNONCE_LIMITS } from '@/lib/constants'
+import { autoMigrate } from '@/lib/migrate'
 
 // Renew an expired annonce - resets expiresAt to 7 days from now
 export async function POST(request: Request) {
   try {
+    await autoMigrate()
     const session = await getSession()
     if (!session) {
       return NextResponse.json({ error: 'Authentification requise' }, { status: 401 })

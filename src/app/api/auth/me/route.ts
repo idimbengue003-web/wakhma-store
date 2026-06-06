@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { autoMigrate } from '@/lib/migrate'
 
 export async function GET() {
   try {
+    await autoMigrate()
     const session = await getSession()
     if (!session) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })

@@ -2,12 +2,14 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { getSession } from '@/lib/auth'
 import { getRevealPrice } from '@/lib/constants'
+import { autoMigrate } from '@/lib/migrate'
 import type { Demand, Reveal } from '@prisma/client'
 
 type DemandWithReveals = Demand & { reveals: Reveal[] }
 
 export async function POST(request: Request) {
   try {
+    await autoMigrate()
     const session = await getSession()
     if (!session) {
       return NextResponse.json({ error: 'Authentification requise' }, { status: 401 })
