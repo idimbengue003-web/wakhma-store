@@ -162,7 +162,7 @@ export async function POST(request: Request) {
     const senepayData = await senepayResponse.json()
 
     if (!senepayResponse.ok) {
-      console.error('[SenePay] Checkout creation failed:', senepayData)
+      console.error('[SenePay] Checkout creation failed:', JSON.stringify(senepayData))
 
       // Update payment status to failed
       await db.payment.update({
@@ -170,8 +170,12 @@ export async function POST(request: Request) {
         data: { status: 'failed' },
       })
 
-      const errorMsg = senepayData.message || senepayData.error || 'Erreur lors de la création du paiement'
-      return NextResponse.json({ error: errorMsg }, { status: senepayResponse.status })
+      // Return detailed error from SenePay so user knows what's wrong
+      const detail = senepayData.message || senepayData.code || senepayData.error || ''
+      const errorMsg = detail
+        ? `SenePay: ${detail} (HTTP ${senepayResponse.status})`
+        : `Erreur lors de la création du paiement (HTTP ${senepayResponse.status})`
+      return NextResponse.json({ error: errorMsg, senepayDetail: senepayData }, { status: senepayResponse.status })
     }
 
     // Update payment with session token

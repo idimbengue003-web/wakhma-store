@@ -42,7 +42,7 @@ function RechargeContent() {
         // Demo mode: redirect directly to success page (auto-confirmed)
         window.location.href = data.checkoutUrl || data.redirectUrl
       } else {
-        setError(data.error || 'Erreur lors de la création du paiement')
+        setError(data.error || data.detail || 'Erreur lors de la création du paiement')
         setPayLoading(null)
       }
     } catch {
