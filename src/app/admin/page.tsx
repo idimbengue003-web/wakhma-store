@@ -135,7 +135,7 @@ export default function AdminDashboard() {
         </div>
         <button
           onClick={handleSeed}
-          className="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl text-sm font-medium hover:bg-blue-200 transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-indigo-100 text-blue-900 rounded-xl text-sm font-medium hover:bg-indigo-200 transition-colors flex items-center gap-2"
         >
           <RefreshCw className="w-4 h-4" />
           Initialiser les données démo
@@ -172,16 +172,16 @@ export default function AdminDashboard() {
             <div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <OverviewCard
-                  icon={<Users className="w-6 h-6 text-blue-600" />}
+                  icon={<Users className="w-6 h-6 text-blue-800" />}
                   label="Utilisateurs"
                   value={totalUsers.toString()}
-                  bgColor="bg-blue-100"
+                  bgColor="bg-indigo-100"
                 />
                 <OverviewCard
-                  icon={<FileText className="w-6 h-6 text-blue-600" />}
+                  icon={<FileText className="w-6 h-6 text-blue-800" />}
                   label="Annonces actives"
                   value={activeDemands.length.toString()}
-                  bgColor="bg-blue-100"
+                  bgColor="bg-indigo-100"
                 />
                 <OverviewCard
                   icon={<Eye className="w-6 h-6 text-purple-600" />}
@@ -214,7 +214,7 @@ export default function AdminDashboard() {
                         </p>
                       </div>
                       <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                        demand.status === 'active' ? 'bg-blue-100 text-blue-700' :
+                        demand.status === 'active' ? 'bg-indigo-100 text-blue-900' :
                         demand.status === 'rejected' ? 'bg-red-100 text-red-700' :
                         'bg-gray-100 text-gray-700'
                       }`}>
@@ -251,7 +251,7 @@ export default function AdminDashboard() {
                         <td className="px-4 py-3">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                             u.role === 'admin' ? 'bg-red-100 text-red-700' :
-                            u.role === 'pro' ? 'bg-blue-100 text-blue-700' :
+                            u.role === 'pro' ? 'bg-indigo-100 text-blue-900' :
                             'bg-gray-100 text-gray-700'
                           }`}>
                             {u.role}
@@ -282,7 +282,7 @@ export default function AdminDashboard() {
                         <span className="text-sm">{CATEGORY_EMOJIS[demand.category] || '📦'}</span>
                         <h3 className="text-sm font-semibold text-gray-900 truncate">{demand.title}</h3>
                         <span className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${
-                          demand.status === 'active' ? 'bg-blue-100 text-blue-700' :
+                          demand.status === 'active' ? 'bg-indigo-100 text-blue-900' :
                           demand.status === 'rejected' ? 'bg-red-100 text-red-700' :
                           'bg-gray-100 text-gray-700'
                         }`}>
@@ -301,7 +301,7 @@ export default function AdminDashboard() {
                       {demand.status !== 'active' && (
                         <button
                           onClick={() => handleDemandStatus(demand.id, 'active')}
-                          className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-200 transition-colors flex items-center gap-1"
+                          className="px-3 py-1.5 bg-indigo-100 text-blue-900 rounded-lg text-xs font-medium hover:bg-indigo-200 transition-colors flex items-center gap-1"
                         >
                           <CheckCircle className="w-3.5 h-3.5" />
                           Approuver

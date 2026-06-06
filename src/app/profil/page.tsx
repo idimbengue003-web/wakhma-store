@@ -172,7 +172,7 @@ export default function ProfilPage() {
 
       {/* Success/Error Messages */}
       {successMsg && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700 flex items-center gap-2">
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-900 flex items-center gap-2">
           <CheckCircle className="w-4 h-4 shrink-0" /> {successMsg}
         </div>
       )}
@@ -202,7 +202,7 @@ export default function ProfilPage() {
                   <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
                     user.subscriptionTier === 'king'
                       ? 'bg-yellow-100 text-yellow-700'
-                      : 'bg-blue-50 text-blue-700'
+                      : 'bg-blue-50 text-blue-900'
                   }`}>
                     {subscriptionBadge}
                   </span>
@@ -238,19 +238,19 @@ export default function ProfilPage() {
             </div>
             <div className="bg-blue-50 rounded-xl p-3 text-center">
               <div className="flex items-center justify-center gap-1 mb-1">
-                <ShoppingCart className="w-4 h-4 text-blue-600" />
+                <ShoppingCart className="w-4 h-4 text-blue-800" />
                 <span className="text-xs text-gray-500">Ventes</span>
               </div>
-              <div className="text-lg font-extrabold text-blue-600">
+              <div className="text-lg font-extrabold text-blue-800">
                 {user.salesCount || 0}
               </div>
             </div>
             <div className="bg-blue-50 rounded-xl p-3 text-center">
               <div className="flex items-center justify-center gap-1 mb-1">
-                <Package className="w-4 h-4 text-blue-600" />
+                <Package className="w-4 h-4 text-blue-800" />
                 <span className="text-xs text-gray-500">Achats</span>
               </div>
-              <div className="text-lg font-extrabold text-blue-600">
+              <div className="text-lg font-extrabold text-blue-800">
                 {user.purchasesCount || 0}
               </div>
             </div>
@@ -297,7 +297,7 @@ export default function ProfilPage() {
       {/* ─── ACTIVE ANNOUNCES ─── */}
       <div className="mb-6">
         <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-blue-500" />
+          <TrendingUp className="w-5 h-5 text-blue-800" />
           Annonces actives ({activeAnnonces.length})
         </h2>
 
@@ -336,7 +336,7 @@ export default function ProfilPage() {
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <div className="flex items-center gap-1.5 mb-0.5">
-                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold text-white ${isVente ? 'bg-orange' : 'bg-blue-500'}`}>
+                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold text-white ${isVente ? 'bg-orange' : 'bg-blue-800'}`}>
                               {isVente ? 'Je vends' : 'Je cherche'}
                             </span>
                             <h3 className="text-sm font-semibold text-gray-900 truncate">{demand.title}</h3>
@@ -378,7 +378,7 @@ export default function ProfilPage() {
                         <button
                           onClick={() => handleMarkSold(demand.id, isVente)}
                           disabled={actionLoading === demand.id}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-md text-[11px] font-bold disabled:opacity-50"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 hover:bg-indigo-100 text-blue-900 rounded-md text-[11px] font-bold disabled:opacity-50"
                         >
                           <CheckCircle className="w-3 h-3" />
                           {isVente ? 'Vendu' : 'Acheté'}
@@ -424,7 +424,7 @@ export default function ProfilPage() {
                         <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-700">
                           Expirée
                         </span>
-                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold text-white ${isVente ? 'bg-orange' : 'bg-blue-500'}`}>
+                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold text-white ${isVente ? 'bg-orange' : 'bg-blue-800'}`}>
                           {isVente ? 'Je vends' : 'Je cherche'}
                         </span>
                         <h3 className="text-sm font-semibold text-gray-700 truncate">{demand.title}</h3>
@@ -460,7 +460,7 @@ export default function ProfilPage() {
       {soldAnnonces.length > 0 && (
         <div className="mb-6">
           <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <CheckCircle className="w-5 h-5 text-blue-500" />
+            <CheckCircle className="w-5 h-5 text-blue-800" />
             Terminé ({soldAnnonces.length})
           </h2>
 
@@ -477,7 +477,7 @@ export default function ProfilPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 mb-0.5">
-                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-100 text-blue-700">
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-100 text-blue-900">
                           {isVente ? 'Vendu ✓' : 'Acheté ✓'}
                         </span>
                         <h3 className="text-sm font-semibold text-gray-500 truncate line-through">{demand.title}</h3>

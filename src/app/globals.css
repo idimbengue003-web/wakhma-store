@@ -3,10 +3,10 @@
 :root {
   --background: #ffffff;
   --foreground: #1a1a1a;
-  --orange: #2563eb;
-  --orange-light: #60a5fa;
-  --orange-dark: #1d4ed8;
-  --orange-bg: #eff6ff;
+  --orange: #1e40af;
+  --orange-light: #3b82f6;
+  --orange-dark: #172554;
+  --orange-bg: #eef2ff;
 }
 
 @theme inline {
@@ -28,7 +28,7 @@ body {
 
 /* Lightweight search shadow - no transitions */
 .search-bar-shadow {
-  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 2px 12px rgba(30, 64, 175, 0.15);
 }
 
 /* Card hover - GPU optimized, minimal */
@@ -42,7 +42,7 @@ body {
 
 /* Price - simple color, no gradient text (faster) */
 .price-orange {
-  color: #2563eb;
+  color: #1e40af;
 }
 
 /* Minimal scrollbar */

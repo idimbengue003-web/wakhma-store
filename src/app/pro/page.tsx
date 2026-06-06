@@ -89,8 +89,8 @@ export default function ProDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-              <Zap className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+              <Zap className="w-5 h-5 text-blue-800" />
             </div>
             <div>
               <p className="text-sm text-gray-500">Points</p>
@@ -103,8 +103,8 @@ export default function ProDashboard() {
 
         <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-              <Eye className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+              <Eye className="w-5 h-5 text-blue-800" />
             </div>
             <div>
               <p className="text-sm text-gray-500">Prix révélation</p>
@@ -146,7 +146,7 @@ export default function ProDashboard() {
             </div>
             <Link
               href="/recharge"
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap"
+              className="px-6 py-3 bg-gradient-to-r from-blue-800 to-blue-950 text-white rounded-xl font-bold text-sm transition-all shadow-sm whitespace-nowrap"
             >
               <CreditCard className="w-4 h-4 inline mr-1" />
               S&apos;abonner
@@ -160,7 +160,7 @@ export default function ProDashboard() {
         <h2 className="text-xl font-bold text-gray-900">Demandes récentes</h2>
         <Link
           href="/annonces"
-          className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
+          className="text-sm font-medium text-blue-800 hover:text-blue-900 flex items-center gap-1"
         >
           Voir tout
           <ArrowRight className="w-4 h-4" />
