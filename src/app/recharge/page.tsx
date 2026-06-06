@@ -77,7 +77,7 @@ function RechargeContent() {
       </div>
 
       {success && (
-        <div className="mb-5 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 flex items-center gap-2">
+        <div className="mb-5 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700 flex items-center gap-2">
           <CheckCircle className="w-5 h-5 shrink-0" /> {success}
         </div>
       )}

@@ -317,7 +317,7 @@ function AnnonceCard({ annonce }: { annonce: Annonce }) {
         {(annonce.userSalesCount > 0 || annonce.userPurchasesCount > 0) && (
           <div className="flex items-center gap-2 text-[10px]">
             {annonce.userSalesCount > 0 && (
-              <span className="flex items-center gap-0.5 text-green-600">
+              <span className="flex items-center gap-0.5 text-blue-600">
                 <CheckCircle className="w-2.5 h-2.5" /> {annonce.userSalesCount} vente{annonce.userSalesCount > 1 ? 's' : ''}
               </span>
             )}
@@ -334,7 +334,7 @@ function AnnonceCard({ annonce }: { annonce: Annonce }) {
             href={`https://wa.me/221${annonce.whatsapp.replace(/\s/g, '')}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full flex items-center justify-center gap-1.5 mt-1 px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-bold text-xs"
+            className="w-full flex items-center justify-center gap-1.5 mt-1 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-bold text-xs"
           >
             <MessageCircle className="w-3.5 h-3.5" /> Contacter
           </a>

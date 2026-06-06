@@ -114,8 +114,8 @@ export default function DeposerPage() {
     return (
       <div className="max-w-lg mx-auto px-4 py-16 text-center">
         <div className="bg-white rounded-xl shadow-lg border border-orange/20 p-8">
-          <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-7 h-7 text-green-600" />
+          <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="w-7 h-7 text-blue-600" />
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">Annonce publiée !</h2>
           <p className="text-sm text-gray-500 mb-6">

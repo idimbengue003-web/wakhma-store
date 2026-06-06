@@ -172,7 +172,7 @@ export default function ProfilPage() {
 
       {/* Success/Error Messages */}
       {successMsg && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 flex items-center gap-2">
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700 flex items-center gap-2">
           <CheckCircle className="w-4 h-4 shrink-0" /> {successMsg}
         </div>
       )}
@@ -236,12 +236,12 @@ export default function ProfilPage() {
                 {user.points.toLocaleString('fr-FR')}
               </div>
             </div>
-            <div className="bg-green-50 rounded-xl p-3 text-center">
+            <div className="bg-blue-50 rounded-xl p-3 text-center">
               <div className="flex items-center justify-center gap-1 mb-1">
-                <ShoppingCart className="w-4 h-4 text-green-600" />
+                <ShoppingCart className="w-4 h-4 text-blue-600" />
                 <span className="text-xs text-gray-500">Ventes</span>
               </div>
-              <div className="text-lg font-extrabold text-green-600">
+              <div className="text-lg font-extrabold text-blue-600">
                 {user.salesCount || 0}
               </div>
             </div>
@@ -297,7 +297,7 @@ export default function ProfilPage() {
       {/* ─── ACTIVE ANNOUNCES ─── */}
       <div className="mb-6">
         <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-green-500" />
+          <TrendingUp className="w-5 h-5 text-blue-500" />
           Annonces actives ({activeAnnonces.length})
         </h2>
 
@@ -378,7 +378,7 @@ export default function ProfilPage() {
                         <button
                           onClick={() => handleMarkSold(demand.id, isVente)}
                           disabled={actionLoading === demand.id}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 hover:bg-green-100 text-green-700 rounded-md text-[11px] font-bold disabled:opacity-50"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-md text-[11px] font-bold disabled:opacity-50"
                         >
                           <CheckCircle className="w-3 h-3" />
                           {isVente ? 'Vendu' : 'Acheté'}
@@ -460,7 +460,7 @@ export default function ProfilPage() {
       {soldAnnonces.length > 0 && (
         <div className="mb-6">
           <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <CheckCircle className="w-5 h-5 text-green-500" />
+            <CheckCircle className="w-5 h-5 text-blue-500" />
             Terminé ({soldAnnonces.length})
           </h2>
 
@@ -470,14 +470,14 @@ export default function ProfilPage() {
               const emoji = CATEGORY_EMOJIS[demand.category] || '📦'
 
               return (
-                <div key={demand.id} className="bg-white rounded-xl border border-green-200 p-4 opacity-60">
+                <div key={demand.id} className="bg-white rounded-xl border border-blue-200 p-4 opacity-60">
                   <div className="flex gap-3">
-                    <div className="w-16 h-16 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
+                    <div className="w-16 h-16 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
                       <span className="text-2xl">{emoji}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 mb-0.5">
-                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-green-100 text-green-700">
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-100 text-blue-700">
                           {isVente ? 'Vendu ✓' : 'Acheté ✓'}
                         </span>
                         <h3 className="text-sm font-semibold text-gray-500 truncate line-through">{demand.title}</h3>
