@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { getSession } from '@/lib/auth'
 import { maskPhonesInText, containsPhoneInText, maskPhone } from '@/lib/constants'
+import type { Demand, User, Reveal } from '@prisma/client'
+
+type DemandWithRelations = Demand & { user: User; reveals: Reveal[] }
 
 export async function GET(request: Request) {
   try {
@@ -34,7 +37,7 @@ export async function GET(request: Request) {
     // Get session for masking logic
     const session = await getSession()
 
-    const maskedDemands = demands.map((d) => {
+    const maskedDemands = (demands as DemandWithRelations[]).map((d) => {
       const isOwner = session?.userId === d.userId
       const hasRevealed = d.reveals.some((r) => r.userId === session?.userId)
 

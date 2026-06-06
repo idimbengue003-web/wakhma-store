@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { getSession } from '@/lib/auth'
 import { getRevealPrice } from '@/lib/constants'
+import type { Demand, Reveal } from '@prisma/client'
+
+type DemandWithReveals = Demand & { reveals: Reveal[] }
 
 export async function POST(request: Request) {
   try {
@@ -20,7 +23,7 @@ export async function POST(request: Request) {
     const demand = await db.demand.findUnique({
       where: { id: demandId },
       include: { reveals: true },
-    })
+    }) as DemandWithReveals | null
 
     if (!demand) {
       return NextResponse.json({ error: 'Annonce introuvable' }, { status: 404 })
